@@ -126,46 +126,58 @@ footer {
   }
 
 footer>i {
-  
   flex-shrink: 0;
 }
+
 /* Responsive layout - makes a two column-layout instead of four columns */
-/* @media screen and (max-width: 800px) {
-  .column {
-    -ms-flex: 50%;
-    flex: 50%;
-    max-width: 50%;
+@media screen and (max-width: 414px) { 
+  body {
+    font-family: 'open-sans';
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  header {
+  display: flex;
+  flex-direction: column;
+  align-items:center;
+}
+
+  header>h1 {
+    font-size: 150%;
+ }
+
+ header>h2 {
+  font-size: 100%;
+}
+
+  main{
+    width: 100%;
+    justify-content: space-evenly;
+    align-items:center;
+    display: flex;
+    flex-wrap: wrap;  
   }
   
+  .row{
+    display: flex;
+    flex-wrap: wrap;
+  }
 
-
-} */
-
-/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
-/* @media screen and (max-width: 640px) {
   .column {
     -ms-flex: 100%;
     flex: 100%;
     max-width: 100%;
-  }
-  header {
-    /* text-align: center; */
-    /* padding: 32px; */
-    grid-area: header;
-    background-color:#D5D5D5;
-    display: flex;
-    justify-content:center;
-    align-items:center;
-    justify-content: space-evenly;
-    flex-direction: column;
-  
+    opacity: 0.5;
+    display: inline-flexbox;
   }
   
-  header>h1{
-    margin: 0;
-    }
-  
-  header>h2{
-    margin: 0;
+  footer{
+    margin: auto;
+    margin-bottom: 4%;
+    justify-content: space-around;
   }
-} */
+} 
