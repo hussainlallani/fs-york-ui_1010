@@ -1,5 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
 * {
   box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+
 }
 
 body {
@@ -17,16 +21,25 @@ body {
 header {
   grid-area: header;
   display: flex;
-  justify-content:center;
+  justify-content:space-evenly;
   flex-direction: column;
   padding-left: 2.6%;
 }
 
 header>h1{
+  font-size: 200%;
+  margin: 0;
 }
 
 header>h2{
-  
+  font-size: 140%;
+  margin: 0;
+  color: #606060;
+  font-weight: normal;
+}
+
+header>h2>b{
+  font-weight: bold;
 }
 
 main {
@@ -48,9 +61,8 @@ main {
   max-height: 100%;
   max-width: 100%;
   display: flex; 
-  /* margin-left: -4.2%; */
-  /* background-color:blueviolet; */
   justify-content: space-evenly;
+  margin: 0;
 }
 
 figure{
@@ -64,13 +76,14 @@ img {
  }
 
 div.column>figure.img-landscape{
-  max-height: 29.14%;
+  max-height: 28.1%;
   flex-grow: 1;
 }
 
 
 div.column>figure.img-portrait{
-  max-height: 64.86%;
+  /* max-height: 64.86%; */
+  max-height: 63.1%; 
   flex-grow: 2;
 }
 
@@ -143,15 +156,24 @@ footer>i {
   header {
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
   align-items:center;
 }
 
   header>h1 {
     font-size: 150%;
+    margin-top: 5%;
  }
 
  header>h2 {
   font-size: 100%;
+  margin-top: 5%;
+  color: #606060;
+  font-weight: normal;
+}
+
+header>h2>b{
+  font-weight: bold;
 }
 
   main{
