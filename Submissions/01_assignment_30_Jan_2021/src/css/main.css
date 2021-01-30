@@ -146,7 +146,7 @@ footer>i {
 }
 
 /* Responsive layout - makes a two column-layout instead of four columns */
-@media screen and (max-width: 650px ) { 
+@media screen and (max-width: 816px ) { 
   body {
     font-family: 'open-sans';
     height: 100%;
@@ -266,7 +266,7 @@ figcaption>p{
 
 
 /* Responsive layout - makes a two column-layout instead of four columns */
-@media screen and (max-height: 650px ) { 
+@media screen and (max-height: 600px ) { 
   body {
     font-family: 'open-sans';
     height: 100%;
