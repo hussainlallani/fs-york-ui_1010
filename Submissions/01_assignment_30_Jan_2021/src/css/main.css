@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+
+}
+
+body {
+  margin: 0;
+  font-family: 'open-sans';
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 20% 75% 5%;
+  grid-template-areas: "header" "main" "footer";
+  background-color: #D5D5D5;
+}
+
+header {
+  grid-area: header;
+  display: flex;
+  justify-content:space-evenly;
+  flex-direction: column;
+  padding-left: 2.6%;
+}
+
+header>h1{
+  font-size: 200%;
+  margin: 0;
+}
+
+header>h2{
+  font-size: 140%;
+  margin: 0;
+  color: #606060;
+  font-weight: normal;
+}
+
+header>h2>b{
+  font-weight: bold;
+}
+
+main {
+  grid-area: main;
+  display: flex;
+  max-height: 100%;
+}
+
+.row {
+  display: flex;
+  max-height: 100%;
+  max-width: 93%;
+  justify-content: space-evenly;
+}
+
+/* Create four equal columns that sits next to each other */
+.column {
+  flex-direction: column;
+  max-height: 100%;
+  max-width: 100%;
+  display: flex; 
+  justify-content: space-evenly;
+  margin: 0;
+}
+
+figure{
+  display: flex;
+}
+
+img {
+ max-width: 100%;
+ max-height: 100%;
+ position: relative;
+ }
+
+div.column>figure.img-landscape{
+  max-height: 28.1%;
+  flex-grow: 1;
+}
+
+
+div.column>figure.img-portrait{
+  /* max-height: 64.86%; */
+  max-height: 63.1%; 
+  flex-grow: 2;
+}
+
+figcaption{
+  width: 1px;
+  opacity: 0;
+  background-image: linear-gradient(to bottom right,white 50%, 
+  transparent 50%);
+  z-index: 1;
+}
+
+figcaption:hover{
+  width: 1px;
+  opacity: .75;
+  background-image: linear-gradient(to bottom right,white 50%, 
+  transparent 50%);
+  z-index: 1;
+}
+
+div.column>figure.img-landscape>figcaption{
+  flex-grow: 1;
+  flex-basis: 0;
+  margin-left: -100%;
+}
+
+div.column>figure.img-portrait>figcaption{
+  flex-grow: 2;
+  margin-left: -100%;  
+}
+
+figcaption>h1{
+  font-size: 1.1em;
+  margin-left:3%;
+  width: 80%;
+  font-size: 80%;
+}
+
+figcaption>p{
+  font-size: .8em;
+  margin-left:3%;
+  flex-wrap: wrap;
+  width: 80%;
+  font-size: 55%;
+}
+
+footer {
+  /* padding: 32px; */
+  grid-area: footer;
+  /* background-color:blue; */
+  min-width: 320px ;
+  width: 10%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items:center;
+  align-content: center;
+  }
+
+footer>i {
+  flex-shrink: 0;
+}
+
+/* Responsive layout - makes a two column-layout instead of four columns */
+@media screen and (max-width: 414px) { 
+  body {
+    font-family: 'open-sans';
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items:center;
+}
+
+  header>h1 {
+    font-size: 150%;
+    margin-top: 5%;
+ }
+
+ header>h2 {
+  font-size: 100%;
+  margin-top: 5%;
+  color: #606060;
+  font-weight: normal;
+}
+
+header>h2>b{
+  font-weight: bold;
+}
+
+  main{
+    width: 100%;
+    justify-content: space-evenly;
+    align-items:center;
+    display: flex;
+    flex-wrap: wrap;  
+  }
+  
+  .row{
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .column {
+    -ms-flex: 100%;
+    flex: 100%;
+    max-width: 100%;
+    opacity: 0.5;
+    display: inline-flexbox;
+  }
+  
+  footer{
+    margin: auto;
+    margin-bottom: 4%;
+    justify-content: space-around;
+  }
+} 
