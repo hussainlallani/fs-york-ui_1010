@@ -117,13 +117,16 @@ div.column>figure.img-portrait>figcaption{
 figcaption>h1{
   font-size: 1.1em;
   margin-left:3%;
-  
+  width: 80%;
+  font-size: 80%;
 }
 
 figcaption>p{
   font-size: .8em;
   margin-left:3%;
   flex-wrap: wrap;
+  width: 80%;
+  font-size: 55%;
 }
 
 footer {
