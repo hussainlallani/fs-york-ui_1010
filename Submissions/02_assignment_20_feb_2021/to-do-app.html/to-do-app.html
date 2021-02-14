@@ -51,6 +51,10 @@
       cursor: move;
     }
 
+    input {
+      cursor: move;
+    }
+
     a {
       color: #428bca;
       text-decoration: none;
@@ -85,8 +89,8 @@
     }
 
     input {
-      height: 45px;
-      padding: 10px 16px;
+      /* height: 45px; */
+      /* padding: 10px 16px; */
       font-size: 18px;
       line-height: 1.3;
       border-radius: 6px;
@@ -119,9 +123,24 @@
     .text-muted {
       color: #999;
     }  
+
+    ul {
+      list-style-type:none;
+    }
+
   </style>
 </head>
 <body>
+  <script>
+    function handleChange(e){
+      // // get id of 'changed' element
+      // elemId = e.getAttribute("id"); 
+      // // alert(e.getAttribute("id")) ;
+      // const cb = document.getElementById(elemId);   
+      // console.log(cb.checked);
+      
+    }
+  </script>
 
 <main>
   <div class="container">
@@ -132,6 +151,10 @@
 
     <form>
       <input class="form-control" type="text" placeholder="Add an item...">
+      <button id="todo-add">Add Todo</button>
+      <button id="todo-clear">Clear Completed Todos</button>
+      <!-- <div><span id="todos-count"></span> task left to do</div> -->
+      <div id="todos-count"> </div>
     </form>
 
     <ul>
@@ -144,6 +167,102 @@
 <script>
 
 // INSERT CODE HERE
+$("document").ready(function(){
+
+  let todos = [];
+  
+  $("#todo-add").on("click",(e)=>{
+    // prevent form submit
+    e.preventDefault();
+    // get class form-control
+    todoEntry = $(".form-control");
+
+    let render = function(target,content,attributes){
+      for(const key in attributes) {
+        target.setAttribute(key, attributes[key]);
+        }
+        $(target).append(content)
+    };
+
+    // todoEntry.val()
+    // console.log(todos.filter(todo => todo.id.includes(todoEntry.val())));
+    const isDuplicate = todos.filter(todo => todo.id.includes(todoEntry.val()));
+    // check for input value is not empty and [] == false --> true
+    if ($.trim(todoEntry.val()) && isDuplicate == false ) {
+      // appends li items to ul element
+      
+      const d = new Date();
+      const time = d.toLocaleTimeString();
+      const date = d.toLocaleDateString();
+      
+    
+      todos.push({
+        "timeStamp": d,
+        "id": todoEntry.val(),
+        "isDone": false  
+      });
+
+      const todoDateFormat = todos[todos.length-1].timeStamp;
+
+      // $("ul").append(`<li><input type="checkbox" id=${todos.length}__checkbox onchange={handleChange(this)}>${todoEntry.val()}</li>`);
+      liContent = `
+      <li>
+        <input type="checkbox" id=${todoEntry.val()} class="checkbox">
+          ${todoEntry.val()} <br> 
+          <span name="todoTimeStamp">
+            ${todoDateFormat}
+          </span>
+      </li>
+      `;
+
+      render("ul",liContent);
+
+      // clear input value
+      todoEntry.val('');
+      stateChange();
+    }
+
+    $("li").change(function(e){
+      idEventTarget = $(e.target).attr("id");
+      if($(e.target).is('[type="checkbox"]:checked')) {
+      alert($(e.target).attr("id"));
+        todoIndex = todos.findIndex(todo => todo.id === idEventTarget);
+        todos[todoIndex].isDone = true;
+        console.log(todos);
+        stateChange();
+      } else {
+        todoIndex = todos.findIndex(todo => todo.id === idEventTarget);
+        todos[todoIndex].isDone = false;
+        console.log(todos);
+        stateChange();
+      }
+    })
+
+  });
+
+  $("#todo-clear").on("click",(e)=>{
+    e.preventDefault();
+    $('input[type=checkbox]:checked').each(function() { 
+      todos = todos.filter( todo => todo.id !== $(this).parent().text());
+      $(this).parent().remove();
+      console.log(todos);
+      stateChange();
+    });
+  });
+  
+    // $('input[name=checkbox]').each(function() { 
+    //   console.log("checked");
+    // });
+
+  function stateChange(){
+    if (todos.length>0) {
+      countElm = $("#todos-count");
+      countMsg = `${todos.length} pending task`;
+      (todos.length>1)?countElm.html(`${countMsg}s`):countElm.html(`${countMsg}`);
+      } 
+  }
+  
+});
 
 </script>
 </body>
