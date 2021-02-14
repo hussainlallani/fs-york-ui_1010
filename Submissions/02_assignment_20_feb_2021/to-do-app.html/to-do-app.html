@@ -202,6 +202,7 @@ $("document").ready(function(){
         "isDone": false  
       });
 
+      // Get todos timeStamp prop from Obj in an array; -1 since index starts with 0
       const todoDateFormat = todos[todos.length-1].timeStamp;
 
       // $("ul").append(`<li><input type="checkbox" id=${todos.length}__checkbox onchange={handleChange(this)}>${todoEntry.val()}</li>`);
@@ -217,25 +218,41 @@ $("document").ready(function(){
 
       render("ul",liContent);
 
+      $('ul li').attr('id', function(i) {
+        return 'li-'+(i+1);
+      });
+
       // clear input value
       todoEntry.val('');
       stateChange();
     }
 
     $("li").change(function(e){
-      idEventTarget = $(e.target).attr("id");
+      // get id of input 
+      let eventTargetId = $(e.target).attr("id");
+      //  get of if of li of input tag
+      let liElemId = $(e.target).parent().attr("id");
+      
       if($(e.target).is('[type="checkbox"]:checked')) {
-      alert($(e.target).attr("id"));
-        todoIndex = todos.findIndex(todo => todo.id === idEventTarget);
+        todoIndex = todos.findIndex(todo => todo.id === eventTargetId);
         todos[todoIndex].isDone = true;
-        console.log(todos);
+        // alert($(e.target).parent().attr("id").css({"text-decoration":"line-through"}));
+        $(`#${liElemId}`).css({"text-decoration":"line-through"});
+        // console.log(todos);
         stateChange();
       } else {
-        todoIndex = todos.findIndex(todo => todo.id === idEventTarget);
+        todoIndex = todos.findIndex(todo => todo.id === eventTargetId);
         todos[todoIndex].isDone = false;
+        $(`#${liElemId}`).css({"text-decoration":"none"});
         console.log(todos);
         stateChange();
       }
+
+      
+
+
+
+
     })
 
   });
