@@ -15,6 +15,10 @@
 
     body {
       font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+      background-image: url(./paper_bg.jpg);
+      background-color:rgba(255, 255, 255, .5);
+      background-repeat: repeat,repeat;
+      background-size:auto;
     }
 
     h1 {
@@ -49,6 +53,10 @@
 
     ul li {
       cursor: move;
+      background-color:rgba(255, 255, 255, .8);
+      border-radius: 25px;
+      padding: 2%;
+      margin: 1%;
     }
 
     input {
@@ -67,7 +75,11 @@
       font-weight: 200;
       line-height: 2.1;
       color: inherit;
-      background-color: #eee;
+      /* background-color: #eee; */
+      background-image: url(./paper_bg.jpg);
+      background-color:rgba(255, 255, 255, .5);
+      background-repeat: repeat,repeat;
+      background-size:auto;    
     }
 
     main h1 {
@@ -128,19 +140,24 @@
       list-style-type:none;
     }
 
+    span[name="todoValue"]{
+      /* background-color: red; */
+      display: inline-block;
+      text-align: left;
+      width: 97%;
+    }
+
+    span[name="todoTimedAt"]{
+      /* background-color: yellowgreen; */
+      display: inline-block;
+      font-size: 10px;
+      text-align: right;
+      width: 100%;
+    }
+
   </style>
 </head>
 <body>
-  <script>
-    function handleChange(e){
-      // // get id of 'changed' element
-      // elemId = e.getAttribute("id"); 
-      // // alert(e.getAttribute("id")) ;
-      // const cb = document.getElementById(elemId);   
-      // console.log(cb.checked);
-      
-    }
-  </script>
 
 <main>
   <div class="container">
@@ -153,6 +170,11 @@
       <input class="form-control" type="text" placeholder="Add an item...">
       <button id="todo-add">Add Todo</button>
       <button id="todo-clear">Clear Completed Todos</button>
+      <label for="todo-select">Select All</label>
+      <input type="checkbox" id="todo-select">
+      <label for="todo-sort">Sort Desc</label>
+      <input type="checkbox" id="todo-sort">
+      
       <!-- <div><span id="todos-count"></span> task left to do</div> -->
       <div id="todos-count"> </div>
     </form>
@@ -171,22 +193,28 @@ $("document").ready(function(){
 
   let todos = [];
   
-  $("#todo-add").on("click",(e)=>{
-    // prevent form submit
-    e.preventDefault();
-    // get class form-control
-    todoEntry = $(".form-control");
-
-    let render = function(target,content,attributes){
+  let render = function(target,content,attributes){
       for(const key in attributes) {
         target.setAttribute(key, attributes[key]);
         }
         $(target).append(content)
     };
 
-    // todoEntry.val()
-    // console.log(todos.filter(todo => todo.id.includes(todoEntry.val())));
-    const isDuplicate = todos.filter(todo => todo.id.includes(todoEntry.val()));
+    // assign unique ids to parent and child elements
+    let setUniqueId = function(pElem, cElem){
+      $(`${pElem} ${cElem}`).attr('id', function(i) {
+        return `${cElem}-`+(i+1);
+      });
+    }
+
+  $("#todo-add").on("click",(e)=>{
+    // prevent form submit
+    e.preventDefault();
+    // get class form-control
+    todoEntry = $(".form-control");    
+
+    // check for duplicate entry
+    const isDuplicate = todos.filter(todo => todo.value.includes(todoEntry.val()));
     // check for input value is not empty and [] == false --> true
     if ($.trim(todoEntry.val()) && isDuplicate == false ) {
       // appends li items to ul element
@@ -197,62 +225,72 @@ $("document").ready(function(){
       
     
       todos.push({
-        "timeStamp": d,
-        "id": todoEntry.val(),
+        "timedAt": d,
+        "value": todoEntry.val(),
         "isDone": false  
       });
 
-      // Get todos timeStamp prop from Obj in an array; -1 since index starts with 0
-      const todoDateFormat = todos[todos.length-1].timeStamp;
+      // Get todos timedAt prop from Obj in an array; -1 since index starts with 0
+      const todoDateFormat = todos[todos.length-1].timedAt;
 
-      // $("ul").append(`<li><input type="checkbox" id=${todos.length}__checkbox onchange={handleChange(this)}>${todoEntry.val()}</li>`);
       liContent = `
       <li>
-        <input type="checkbox" id=${todoEntry.val()} class="checkbox">
-          ${todoEntry.val()} <br> 
-          <span name="todoTimeStamp">
+        <input name="todo-checkbox" type="checkbox" class="checkbox">
+          <span name="todoValue">  
+            ${todoEntry.val()} 
+          </span> 
+          <span name="todoTimedAt">
             ${todoDateFormat}
           </span>
       </li>
       `;
 
+      // create li elements with content
       render("ul",liContent);
-
-      $('ul li').attr('id', function(i) {
-        return 'li-'+(i+1);
-      });
-
+      // assign unique ids to li elements
+      setUniqueId("ul","li");
+      // assign unique ids to input elements
+      setUniqueId("li","input");
+      
       // clear input value
       todoEntry.val('');
-      stateChange();
+      todoCount();
     }
 
-    $("li").change(function(e){
-      // get id of input 
-      let eventTargetId = $(e.target).attr("id");
+  function toggleTodo(e){
+      // Getting target(input) parent(li) and then selecting child(span) for values in a li element 
+      const eventTargetValue = $.trim($(e.target).parent().children("span[name='todoValue']").text());
       //  get of if of li of input tag
       let liElemId = $(e.target).parent().attr("id");
       
-      if($(e.target).is('[type="checkbox"]:checked')) {
-        todoIndex = todos.findIndex(todo => todo.id === eventTargetId);
+      if($(e.target).is('input[type="checkbox"]:checked')) {
+        todoIndex = todos.findIndex(todo => todo.value === eventTargetValue);
         todos[todoIndex].isDone = true;
-        // alert($(e.target).parent().attr("id").css({"text-decoration":"line-through"}));
         $(`#${liElemId}`).css({"text-decoration":"line-through"});
-        // console.log(todos);
-        stateChange();
       } else {
-        todoIndex = todos.findIndex(todo => todo.id === eventTargetId);
+        todoIndex = todos.findIndex(todo => todo.value === eventTargetValue);
         todos[todoIndex].isDone = false;
         $(`#${liElemId}`).css({"text-decoration":"none"});
         console.log(todos);
-        stateChange();
       }
+    };
 
-      
+      $("#todo-select").click(function(e){
+        $('input[name="todo-checkbox"][type="checkbox"]').prop("checked",$(this).prop('checked'));
+        toggleTodo(e);
+      });
+
+      $('input[name="todo-checkbox"][type="checkbox"]').change(function(e){
+        if (!$(this).prop("checked")){
+            $("#todo-select").prop("checked",false);
+            toggleTodo(e);
+        }
+    });
 
 
-
-
+    $("li").change(function(e){
+      toggleTodo(e);
+      todoCount();
     })
 
   });
@@ -260,23 +298,27 @@ $("document").ready(function(){
   $("#todo-clear").on("click",(e)=>{
     e.preventDefault();
     $('input[type=checkbox]:checked').each(function() { 
-      todos = todos.filter( todo => todo.id !== $(this).parent().text());
+      todos = todos.filter( todo => todo.value !== $(this).parent().text());
       $(this).parent().remove();
       console.log(todos);
-      stateChange();
+      todoCount();
     });
   });
-  
-    // $('input[name=checkbox]').each(function() { 
-    //   console.log("checked");
-    // });
 
-  function stateChange(){
-    if (todos.length>0) {
+  let countTodo=0;
+  
+  function todoCount(){  
+    let numberOfDoneTodos = $('input[name="todo-checkbox"][type="checkbox"]:checked').length;
+    console.log(numberOfDoneTodos);
+    let totalTodos = $('input[name="todo-checkbox"][type="checkbox"]').length;
+    let numberNotDone = totalTodos - numberOfDoneTodos;
+   
+    if (numberNotDone=>0) {
       countElm = $("#todos-count");
-      countMsg = `${todos.length} pending task`;
-      (todos.length>1)?countElm.html(`${countMsg}s`):countElm.html(`${countMsg}`);
-      } 
+      countMsg = `${numberNotDone} to-do left`;
+      // (todos.length>=1)?countElm.html(`${countMsg}s`):countElm.html(`${countMsg}`);
+      countElm.html(`${countMsg}`);
+    } 
   }
   
 });
