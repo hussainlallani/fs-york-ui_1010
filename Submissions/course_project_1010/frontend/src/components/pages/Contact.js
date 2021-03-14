@@ -11,9 +11,10 @@ const Contact = () => {
 
     const formSubmit = async event => {
         event.preventDefault()
-        const response = await fetch('http://localhost:4000/contact_form/entries', {
+        const response = await fetch('http://localhost:9000/contact_form/entries', {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
               },
@@ -21,7 +22,7 @@ const Contact = () => {
         })
         const payload = await response.json()
         if (response.status >= 400) {
-            alert(`Oops! Error: ${payload.message} for fields: ${payload.invalid.join(",")}`)
+            // alert(`Oops! Error: ${payload.message} for fields: ${payload.invalid.join(",")}`)
         } else {
             alert(`Congrats! Submission submitted with id: ${payload.id}`)
         }

@@ -29,7 +29,7 @@ const Home = () => {
             </Card>
             <Row>
                 <Col md="4" className="mb-5">
-                    <Card>
+                    <Card className="h-100">
                         <CardBody>
                             <CardTitle><h2>CMS Website Development</h2></CardTitle>
                             <CardBody>We build dynamic CMS enabled websites that empower you and your business.</CardBody>

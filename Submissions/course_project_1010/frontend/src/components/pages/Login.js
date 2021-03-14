@@ -10,24 +10,38 @@ const Login = () => {
     const [auth, setAuth] = useState(true)
 
     const loginSubmit = async event => {
-        
-        event.preventDefault()
-        const response = await fetch('http://localhost:4000/auth', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              },
-            body: JSON.stringify({username, password})
-        })
-        const payload = await response.json()
-        if (response.status >= 400) {
-            setAuth(false)
-        } else {
-            sessionStorage.setItem('token', payload.token)
-
-            let { from } = location.state || { from: { pathname: "/" } };
-            history.replace(from);
+      
+      event.preventDefault()
+      try{
+        const response = await fetch('http://localhost:9000/auth', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            "Access-Control-Allow-Origin" : "*", 
+            "Access-Control-Allow-Credentials" : true, 
+                },
+              body: JSON.stringify({username, password})
+          });
+          const payload = await response.json();
+          alert(payload.token);
+          if (response.status >= 400) {
+              setAuth(false);
+          } else {
+              console.log(payload);
+              sessionStorage.setItem('token', payload.token);
+              this.props.history.push("/");
+  
+              let { from } = location.state || { from: { pathname: "/" } };
+              history.replace(from);
+          }
+        } catch(ex){
+          if (ex.response && ex.response.status === 400){
+            const errors = {...this.state.errors};
+            errors.username = ex.response.data;
+            this.setState({errors});
+          }
+          console.log(ex);
         }
     }
 
