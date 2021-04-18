@@ -5,7 +5,6 @@ import { isAdmin } from "../middleware/isAdmin.js";
 // import { verifyToken } from "../middleware/jwtVerify.js";
 import Joi from "joi";
 import * as db from "../utilities/jsonHandler.js";
-import { conn } from "../database/connection.js";
 
 // Declare primary(param) key
 var pkText = "id";
@@ -15,19 +14,41 @@ router.post("/", async (req, res) => {
   const { error } = validateContactForm(req.body);
   if (error) {
     // console.log(error.details[0].message);
-    return res.status(400).send(error.details[0].message);
+    return res.status(400).send({ message: error.details[0].message });
   }
+
   // Get payload
   const { name, email, phoneNumber, content } = req.body;
 
-  const sql = `INSERT INTO portdb.entries
-    ( name, email, phone, content) VALUES ('${name}','${email}','${phoneNumber}', '${content}');`;
+  let payload = {
+    id: Math.floor(Math.random() * Date.now()),
+    name,
+    email,
+    phoneNumber,
+    content,
+  };
 
-  conn.query(sql, function (err, result) {
-    if (err) throw err;
-    console.log("1 record inserted");
-    return res.status(201).send(result);
-  });
+  try {
+    await db.readItems(`${process.env.ENTRIESFILEPATH}`);
+    // Insert payload
+    await db.createItem(
+      `${process.env.ENTRIESFILEPATH}`,
+      JSON.parse(JSON.stringify(payload))
+    );
+    console.log(`Saved to file: ${JSON.parse(JSON.stringify(payload))}`);
+    return res.status(201).send(payload);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      // Insert payload if file not exists
+      await db.createItem(
+        `${process.env.ENTRIESFILEPATH}`,
+        JSON.parse(JSON.stringify(payload))
+      );
+      console.log(`Saved to file: ${JSON.parse(JSON.stringify(payload))}`);
+      return res.status(201).send(payload);
+    }
+    return res.status(404).json(error.message);
+  }
 });
 
 router.get("/", isAuth, isAdmin, async (req, res) => {
