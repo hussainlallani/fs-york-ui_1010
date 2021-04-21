@@ -9,8 +9,8 @@ const isAdmin = async (req, res, next) => {
   if (!token) return res.status(401).send("Access denied. No token provided.");
   try {
     const decoded = jwt.verify(token, `${process.env.PRIVATEKEY}`);
-    console.log(decoded.isAdmin);
-    if (decoded.isAdmin) {
+    console.log(decoded.is_admin);
+    if (decoded.is_admin) {
       next();
     } else {
       return res.status(403).send("Access is denied.");

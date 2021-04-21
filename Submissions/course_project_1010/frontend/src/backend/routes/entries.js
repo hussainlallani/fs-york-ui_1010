@@ -4,38 +4,44 @@ import { isAuth } from "../middleware/isAuth.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 // import { verifyToken } from "../middleware/jwtVerify.js";
 import Joi from "joi";
-import * as db from "../utilities/jsonHandler.js";
-import { conn } from "../database/connection.js";
+// import * as db from "../utilities/jsonHandler.js";
+import { db } from "../database/connection.js";
 
 // Declare primary(param) key
-var pkText = "id";
+var pkText = "entry_id";
 
 router.post("/", async (req, res) => {
   // Validate input
   const { error } = validateContactForm(req.body);
   if (error) {
-    // console.log(error.details[0].message);
     return res.status(400).send(error.details[0].message);
   }
-  // Get payload
+
   const { name, email, phoneNumber, content } = req.body;
 
   const sql = `INSERT INTO portdb.entries
     ( name, email, phone, content) VALUES ('${name}','${email}','${phoneNumber}', '${content}');`;
 
-  conn.query(sql, function (err, result) {
-    if (err) throw err;
-    console.log("1 record inserted");
-    return res.status(201).send(result);
-  });
+  try {
+    const result = await db.query(sql);
+    if (result.affectedRows !== 0) {
+      return res.status(200).json(`${pkText}, successfully created!`);
+    } else {
+      return res.status(400).json(`${pkText}, not created!`);
+    }
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 });
 
 router.get("/", isAuth, isAdmin, async (req, res) => {
+  const sql = `SELECT entry_id, name, email, phone, content
+  FROM
+  ${process.env.DBNAME}.entries;`;
+
   try {
-    const entries = await db.readItems(`${process.env.ENTRIESFILEPATH}`);
-    if (entries.length === 0 || entries === undefined)
-      return res.status(404).json({ message: "Resource not found!" });
-    return res.status(200).send(entries);
+    const results = await db.query(sql);
+    return res.status(200).send(results);
   } catch (error) {
     return res.status(404).json(error.message);
   }
@@ -56,30 +62,24 @@ router.put(`\:${pkText}`, async (req, res) => {
     content,
   };
 
+  const sql = `UPDATE ${process.env.DBNAME}.entries 
+    SET name = ${is_admin}, email = ${email}, phoneNumber = ${phone}. content = ${content} 
+    WHERE ${pkText}='${req.params[pkText]}';`;
+
   // Apply update
   try {
-    // const pkText = "health_card_number";
-    const pkValue = req.params[pkText];
-    await db.updateItem(
-      pkText,
-      pkValue,
-      `${process.env.ENTRIESFILEPATH}`,
-      payload
-    );
-    return res.status(200).json(payload);
+    const results = await db.query(sql);
+    dbStatus(res, results);
   } catch (error) {
     return res.status(500).json(error);
   }
 });
 
 router.delete(`\:${pkText}`, async (req, res) => {
+  const sql = `DELETE FROM ${process.env.DBNAME}.entries WHERE ${pkText}='${req.params[pkText]}';`;
   try {
-    const pkValue = req.params[pkText];
-    // Apply removal
-    await db.removeItem(pkText, pkValue, `${process.env.ENTRIESFILEPATH}`);
-    return res.send(
-      `The record with ${pkText}# ${pkValue} successfully deleted!`
-    );
+    const results = await db.query(sql);
+    dbStatus(res, results);
   } catch (error) {
     return res.status(404).json(error);
   }
@@ -95,5 +95,11 @@ function validateContactForm(reqBody) {
 
   return schemaContactForm.validate(reqBody);
 }
+
+const dbStatus = (res, results) => {
+  if (results.affectedRows !== 0)
+    return res.status(200).json(`Database successfully updated!`);
+  return res.status(400).json(`Error: database not updated!!`);
+};
 
 export default router;

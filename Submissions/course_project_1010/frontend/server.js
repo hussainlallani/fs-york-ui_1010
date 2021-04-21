@@ -23,7 +23,9 @@ app.get("*", (req, res) => {
 });
 
 const port = process.env.REACT_APP_SERVERPORT;
-app.listen(port, () => console.log(`Listening on port ${port}...`));
+app.listen(port, () =>
+  console.log(`Server started! Listening on port ${port}...`)
+);
 
 process.on("uncaughtException", function (err) {
   if (err.errno === "EADDRINUSE") console.log("PORT in USE");

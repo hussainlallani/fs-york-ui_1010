@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import {
-    Form,
-    FormGroup,
-    Col,
-    Input,
-    Label,
+  Form,
+  FormGroup,
+  Col,
+  Input,
+  Label,
   Button,
   Container,
   CardBody,
@@ -51,9 +51,6 @@ const Contact = () => {
         </CardBody>
       </Card>
       <Form className="my-5" onSubmit={formSubmit}>
-        <row>
-          <h1>Hello</h1>
-        </row>
         <FormGroup row>
           <Label for="emailEntry" sm={2}>
             Email

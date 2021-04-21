@@ -20,7 +20,8 @@
     "react-dotenv": "^0.1.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
-    "reactstrap": "^8.4.1"
+    "reactstrap": "^8.4.1",
+    "util": "^0.12.3"
   },
   "scripts": {
     "start": "concurrently \"nodemon -r esm server.js\" \"react-scripts start\"",

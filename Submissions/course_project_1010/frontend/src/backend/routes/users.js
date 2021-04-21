@@ -1,12 +1,14 @@
 import express from "express";
 const router = express.Router();
+import { isAuth } from "../middleware/isAuth.js";
+import { isAdmin } from "../middleware/isAdmin.js";
 import Joi from "joi";
-import * as db from "../utilities/jsonHandler.js";
+// import * as db from "../utilities/jsonHandler.js";
 import bcrypt from "bcrypt";
-import { conn } from "../database/connection.js";
+import { db } from "../database/connection.js";
 
 // Declare primary(param) key
-var pkText = "id";
+var pkText = "username";
 
 router.post("/", async (req, res) => {
   // Validate input
@@ -15,38 +17,35 @@ router.post("/", async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
-  // Get payload
-  let { username, password, isAdmin } = req.body;
+  let { username, password, is_admin } = req.body;
 
-  const payload = { username, isAdmin };
+  const sql = (hashedPwd) => {
+    return `INSERT INTO ${process.env.DBNAME}.users
+  ( username, password, is_admin) VALUES ('${username}','${hashedPwd}',${is_admin})`;
+  };
 
   try {
     //  Hash Password
-    var salt = await bcrypt.genSalt(10);
-    var hashedPwd = await bcrypt.hash("123", salt);
-
-    password = hashedPwd;
-
-    const sql = `INSERT INTO portdb.users
-    ( username, password, isadmin) VALUES ('${username}','${password}',${isAdmin})`;
-
-    conn.query(sql, function (err, result) {
-      if (err) throw err;
-      console.log("1 record inserted");
-      return res.status(201).send(result);
-    });
+    const hashedPwd = await hashPwd(password);
+    const results = await db.query(sql(hashedPwd));
+    dbStatus(res, results);
   } catch (error) {
-    // Show errors if found
-    return res.status(404).json(error.message);
+    if (error.errno === 1062) {
+      return res.status(409).json(error.message);
+    }
+    return res.status(500).json(error);
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", isAuth, isAdmin, async (req, res) => {
+  const sql = `SELECT username, is_admin
+  FROM
+    ${process.env.DBNAME}.users;`;
+
   try {
-    const users = await db.readItems(`${process.env.USERSFILEPATH}`);
-    if (users.length === 0 || users === undefined)
-      return res.status(404).json({ message: "Resource not found!" });
-    return res.status(200).send(users);
+    let results = await db.query(sql);
+
+    return res.status(200).send(results);
   } catch (error) {
     return res.status(404).json(error.message);
   }
@@ -54,39 +53,36 @@ router.get("/", async (req, res) => {
 
 router.put(`/:${pkText}`, async (req, res) => {
   // Validate input
-  const { error } = validateUserForm(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  // const { error } = validateUserForm(req.body);
+  // if (error) return res.status(400).send(error.details[0].message);
 
-  const { email, password, isAdmin } = req.body;
+  // console.log(`${req.params[pkText]};`);
+
+  const { username, is_admin } = req.body;
 
   // Get payload
-  const payload = { email, password, isAdmin };
+  const payload = { username, is_admin };
+
+  const sql = `UPDATE ${process.env.DBNAME}.users 
+    SET is_admin = ${is_admin} 
+    WHERE ${pkText}='${req.params[pkText]}';`;
 
   // Apply update
   try {
-    const pkValue = req.params[pkText];
-    await db.updateItem(
-      pkText,
-      pkValue,
-      `${process.env.USERSFILEPATH}`,
-      payload
-    );
-    return res.status(200).json(payload);
+    const results = await db.query(sql);
+    dbStatus(res, results);
   } catch (error) {
     return res.status(500).json(error);
   }
 });
 
 router.delete(`/:${pkText}`, async (req, res) => {
+  const sql = `DELETE FROM ${process.env.DBNAME}.users WHERE ${pkText}='${req.params[pkText]}';`;
   try {
-    // Apply removal
-    const pkValue = req.params[pkText];
-
-    await db.removeItem(pkText, pkValue, `${process.env.USERSFILEPATH}`);
-    return res.send(
-      `The record with ${pkText}# ${pkValue} successfully deleted!`
-    );
+    const results = await db.query(sql);
+    dbStatus(res, results);
   } catch (error) {
+    console.log(error);
     return res.status(404).json(error);
   }
 });
@@ -95,10 +91,26 @@ const validateUserForm = (reqBody) => {
   const schemaUserForm = Joi.object({
     username: Joi.string().min(5).email().required(),
     password: Joi.string().min(8).required(),
-    isAdmin: Joi.boolean().required(),
+    is_admin: Joi.boolean().required(),
   });
 
   return schemaUserForm.validate(reqBody);
+};
+
+const dbStatus = (res, results) => {
+  if (results.affectedRows !== 0)
+    return res.status(200).json(`Database successfully updated!`);
+  return res.status(400).json(`Error: database not updated!!`);
+};
+
+const hashPwd = async (password) => {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPwd = await bcrypt.hash(password, salt);
+    return hashedPwd;
+  } catch (error) {
+    if (error) throw error;
+  }
 };
 
 export default router;
