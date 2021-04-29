@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Table, Button } from "reactstrap";
+import {
+  Container,
+  Row,
+  Table,
+  Button,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Input,
+} from "reactstrap";
 import parseJwt from "../../helpers/authHelper";
 import { useHistory } from "react-router-dom";
 
@@ -13,6 +22,19 @@ const Listings = () => {
     sessionStorage.removeItem("token");
     history.push("/login");
   };
+
+  const handleEdit = (event, index) => {
+    console.log(event.currentTarget);
+    // console.log("Edit pressed!", index);
+  };
+
+  const handleDelete = (index) => {
+    console.log("Delete pressed!", index);
+    const listingCopy = [...listing];
+    listingCopy.splice(index, 1);
+    setListing([...listingCopy]);
+  };
+
   useEffect(() => {
     const getData = async () => {
       const response = await fetch(
@@ -34,13 +56,16 @@ const Listings = () => {
       <Row>
         <h1>Listings for user: {user}</h1>
       </Row>
-      <Table responsive>
+      <Table responsive className="text-white">
         <thead>
           <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Phone Number</th>
             <th>Email</th>
+            <th>Message</th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -52,12 +77,37 @@ const Listings = () => {
             </tr>
           )}
           {listing.length > 0 &&
-            listing.map((entry) => (
-              <tr>
-                <td>{entry.id}</td>
+            listing.map((entry, index) => (
+              <tr key={entry.entry_id}>
+                <td>{entry.entry_id}</td>
                 <td>{entry.name}</td>
                 <td>{entry.phoneNumber}</td>
                 <td>{entry.email}</td>
+                {/* <td>{entry.content}</td> */}
+                <td>
+                  {" "}
+                  <InputGroup>
+                    <InputGroupAddon addonType="prepend"></InputGroupAddon>
+                    <Input
+                      placeholder="username"
+                      readonly="readonly"
+                      value={entry.content}
+                    />
+                  </InputGroup>
+                </td>
+                <td>
+                  <Button
+                    color="primary"
+                    onClick={(event) => handleEdit(event, index)}
+                  >
+                    &#9998;
+                  </Button>
+                </td>
+                <td>
+                  <Button color="danger" onClick={() => handleDelete(index)}>
+                    X
+                  </Button>
+                </td>
               </tr>
             ))}
         </tbody>
