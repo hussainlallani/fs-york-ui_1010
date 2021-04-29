@@ -38,25 +38,23 @@ const Login = () => {
         }
       );
       const payload = await response.json();
-      alert(payload.token);
       if (response.status >= 400) {
         setAuth(false);
       } else {
         console.log(payload);
         sessionStorage.setItem("token", payload.token);
-        // this.props.history.push("/");
-        this.props.history.push("/");
+        history.push("/");
 
         let { from } = location.state || { from: { pathname: "/" } };
         history.replace(from);
       }
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
-        const errors = { ...this.state.errors };
-        errors.username = ex.response.data;
-        this.setState({ errors });
+        // const errors = { ...this.state.errors };
+        // errors.username = ex.response.data;
+        // this.setState({ errors });
+        console.log(ex);
       }
-      console.log(ex);
     }
   };
 
