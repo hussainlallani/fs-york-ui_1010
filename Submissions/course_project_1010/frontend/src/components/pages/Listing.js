@@ -6,7 +6,7 @@ import {
   Button,
   InputGroup,
   InputGroupAddon,
-  InputGroupText,
+  // InputGroupText,
   Input,
 } from "reactstrap";
 import parseJwt from "../../helpers/authHelper";
@@ -23,15 +23,22 @@ const Listings = () => {
     history.push("/login");
   };
 
-  const handleEdit = (event, index) => {
-    console.log(event.currentTarget);
-    // console.log("Edit pressed!", index);
+  const handleEdit = (index) => {
+    const listingCopy = [...listing];
+    listingCopy[index]["readonly"] = true;
+    setListing([...listingCopy]);
   };
 
   const handleDelete = (index) => {
     console.log("Delete pressed!", index);
     const listingCopy = [...listing];
     listingCopy.splice(index, 1);
+    setListing([...listingCopy]);
+  };
+
+  const changeInputHandler = (event, index, key) => {
+    const listingCopy = [...listing];
+    listingCopy[index][key] = event.target.value;
     setListing([...listingCopy]);
   };
 
@@ -51,6 +58,7 @@ const Listings = () => {
     };
     getData();
   }, [token]);
+
   return (
     <Container>
       <Row>
@@ -83,22 +91,25 @@ const Listings = () => {
                 <td>{entry.name}</td>
                 <td>{entry.phoneNumber}</td>
                 <td>{entry.email}</td>
-                {/* <td>{entry.content}</td> */}
+                <td>{entry.content}</td>
                 <td>
                   {" "}
                   <InputGroup>
                     <InputGroupAddon addonType="prepend"></InputGroupAddon>
                     <Input
                       placeholder="username"
-                      readonly="readonly"
                       value={entry.content}
+                      onChange={(event) =>
+                        changeInputHandler(event, index, "content")
+                      }
+                      readOnly={!!entry.readonly ? false : true}
                     />
                   </InputGroup>
                 </td>
                 <td>
                   <Button
                     color="primary"
-                    onClick={(event) => handleEdit(event, index)}
+                    onClick={(event) => handleEdit(index)}
                   >
                     &#9998;
                   </Button>
