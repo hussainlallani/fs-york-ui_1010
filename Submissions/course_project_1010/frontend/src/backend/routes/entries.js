@@ -14,13 +14,13 @@ router.post("/", async (req, res) => {
   // Validate input
   const { error } = validateContactForm(req.body);
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return res.status(400).json(error.details[0].message);
   }
 
-  const { name, email, phoneNumber, content } = req.body;
+  const { name, email, phone, content } = req.body;
 
   const sql = `INSERT INTO portdb.entries
-    ( name, email, phone, content) VALUES ('${name}','${email}','${phoneNumber}', '${content}');`;
+    ( name, email, phone, content) VALUES ('${name}','${email}','${phone}', '${content}');`;
 
   try {
     const result = await db.query(sql);
@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", isAuth, isAdmin, async (req, res) => {
-  const sql = `SELECT entry_id, name, email, phone, content
+  const sql = `SELECT entry_id, name, email, phone, content, timestamp
   FROM
   ${process.env.DBNAME}.entries;`;
 
@@ -47,23 +47,14 @@ router.get("/", isAuth, isAdmin, async (req, res) => {
   }
 });
 
-router.put(`\:${pkText}`, async (req, res) => {
-  // Validate input
-  const { error } = validateContactForm(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
-  // Get payload
-  const { name, email, phoneNumber, content } = req.body;
-
-  const payload = {
-    name,
-    email,
-    phoneNumber,
-    content,
-  };
+router.put(`/:${pkText}`, async (req, res) => {
+  let query = [];
+  Object.entries(req.body).map((entry) => {
+    query.push(`${entry[0]} = '${entry[1]}'`);
+  });
 
   const sql = `UPDATE ${process.env.DBNAME}.entries 
-    SET name = ${is_admin}, email = ${email}, phoneNumber = ${phone}. content = ${content} 
+    SET ${query} 
     WHERE ${pkText}='${req.params[pkText]}';`;
 
   // Apply update
@@ -75,7 +66,7 @@ router.put(`\:${pkText}`, async (req, res) => {
   }
 });
 
-router.delete(`\:${pkText}`, async (req, res) => {
+router.delete(`/:${pkText}`, async (req, res) => {
   const sql = `DELETE FROM ${process.env.DBNAME}.entries WHERE ${pkText}='${req.params[pkText]}';`;
   try {
     const results = await db.query(sql);
@@ -89,7 +80,7 @@ function validateContactForm(reqBody) {
   const schemaContactForm = Joi.object({
     name: Joi.string().min(3).required(),
     email: Joi.string().min(4).email().required(),
-    phoneNumber: Joi.string().length(10).pattern(/^\d+$/).required(),
+    phone: Joi.string().length(10).pattern(/^\d+$/).required(),
     content: Joi.string().max(255).required(),
   });
 

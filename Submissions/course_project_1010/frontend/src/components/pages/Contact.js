@@ -15,29 +15,35 @@ import {
 const Contact = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phone, setPhone] = useState("");
   const [content, setContent] = useState("");
   const formSubmit = async (event) => {
     event.preventDefault();
-    const response = await fetch(
-      `http://localhost:${process.env.REACT_APP_SERVERPORT}/contact_form/entries`,
-      {
-        method: "POST",
-        headers: {
-          // Authorization: `Bearer ${localStorage.getItem("token")}`,
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, phoneNumber, content }),
+    try {
+      const response = await fetch(
+        `http://localhost:${process.env.REACT_APP_SERVERPORT}/contact_form/entries`,
+        {
+          method: "POST",
+          headers: {
+            // Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, phone, content }),
+        }
+      );
+      // alert(JSON.stringify({ name, email, phone, content }));
+      alert(JSON.stringify(response));
+      const payload = await response.json();
+      if (response.status >= 400) {
+        // alert(`${response}`);
+      } else {
+        alert(`Congrats! Submission submitted with id: ${payload}`);
+        //   history.push("/login");
+        window.location.href = "/";
       }
-    );
-    const payload = await response.json();
-    if (response.status >= 400) {
-      alert(`${payload.message}`);
-    } else {
-      alert(`Congrats! Submission submitted with id: ${payload.id}`);
-      //   history.push("/login");
-      window.location.href = "/";
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -73,12 +79,13 @@ const Contact = () => {
           </Label>
           <Col sm={10}>
             <Input
-              type="phone"
+              type="tel"
               name="phone"
               id="phoneEntry"
               placeholder="Enter phone number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
             />
           </Col>
         </FormGroup>

@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from "react";
-import {
-  Container,
-  Row,
-  Table,
-  Button,
-  InputGroup,
-  InputGroupAddon,
-  // InputGroupText,
-  Input,
-} from "reactstrap";
+import { Container, Row, Button, Col, Form } from "reactstrap";
 import parseJwt from "../../helpers/authHelper";
 import { useHistory } from "react-router-dom";
 
+var token = sessionStorage.getItem("token");
+
 const Listings = () => {
   let history = useHistory();
-  const token = sessionStorage.getItem("token");
   const user = parseJwt(token).username;
   const [listing, setListing] = useState([]);
+  const [payload, setPayload] = useState({});
+
   const logout = (event) => {
     event.preventDefault();
     sessionStorage.removeItem("token");
@@ -29,17 +23,89 @@ const Listings = () => {
     setListing([...listingCopy]);
   };
 
-  const handleDelete = (index) => {
-    console.log("Delete pressed!", index);
+  const handleBlur = (index) => {
     const listingCopy = [...listing];
-    listingCopy.splice(index, 1);
+    listingCopy[index]["readonly"] = false;
     setListing([...listingCopy]);
   };
 
-  const changeInputHandler = (event, index, key) => {
-    const listingCopy = [...listing];
-    listingCopy[index][key] = event.target.value;
-    setListing([...listingCopy]);
+  const handleDelete = async (index, id) => {
+    const response = await fetch(
+      `http://localhost:${process.env.REACT_APP_SERVERPORT}/contact_form/entries/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const res = await response.json();
+    if (response.status >= 400) {
+      alert(`Oops! Error ${response.status}:  ${res.message}`);
+    } else {
+      // alert(`Congratulations! Submission submitted with id: ${id}`);
+      const listingCopy = [...listing];
+      listingCopy.splice(index, 1);
+      setListing([...listingCopy]);
+    }
+  };
+
+  const changeInputHandler = async (event, index, id) => {
+    event.persist();
+    setPayload((prevState) => ({
+      ...prevState,
+      [event.target.name]: event.target.value,
+    }));
+
+    console.log(payload);
+
+    // if (listingCopy !== listing) {
+    //   setListing([...listingCopy]);
+    // }
+    // event.preventDefault();
+    // setListing((prevState) => ({
+    //   ...prevState,
+    //   ...(prevState[index][event.target.name] = event.target.value),
+    // }));
+    // console.log(listing);
+  };
+
+  const handleSubmit = async (event, index, id) => {
+    event.preventDefault();
+    // if (!listing[index]["readonly"]) {
+    const response = await fetch(
+      `http://localhost:${process.env.REACT_APP_SERVERPORT}/contact_form/entries/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    alert(JSON.stringify(payload));
+
+    const res = await response.json();
+    if (response.status >= 400) {
+      alert(`Oops! Error ${response.status}:  ${res.message}`);
+    } else {
+      alert(`Congratulations! Submission submitted with id: ${id}`);
+      setPayload("");
+      handleBlur(index);
+    }
+
+    // }
   };
 
   useEffect(() => {
@@ -57,72 +123,137 @@ const Listings = () => {
       setListing(data);
     };
     getData();
-  }, [token]);
+  }, []);
 
   return (
     <Container>
       <Row>
         <h1>Listings for user: {user}</h1>
       </Row>
-      <Table responsive className="text-white">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Phone Number</th>
-            <th>Email</th>
-            <th>Message</th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {listing.length === 0 && (
-            <tr>
-              <td colSpan="4" className="text-center">
-                <i>No listings found</i>
-              </td>
-            </tr>
-          )}
-          {listing.length > 0 &&
-            listing.map((entry, index) => (
-              <tr key={entry.entry_id}>
-                <td>{entry.entry_id}</td>
-                <td>{entry.name}</td>
-                <td>{entry.phoneNumber}</td>
-                <td>{entry.email}</td>
-                <td>{entry.content}</td>
-                <td>
-                  {" "}
-                  <InputGroup>
-                    <InputGroupAddon addonType="prepend"></InputGroupAddon>
-                    <Input
-                      placeholder="username"
-                      value={entry.content}
-                      onChange={(event) =>
-                        changeInputHandler(event, index, "content")
-                      }
-                      readOnly={!!entry.readonly ? false : true}
-                    />
-                  </InputGroup>
-                </td>
-                <td>
+      <Row>
+        <Col md={1} className="m-1">
+          Date
+        </Col>
+        <Col md={2} className="m-1">
+          Name
+        </Col>
+        <Col md={1} className="m-1">
+          Phone
+        </Col>
+        <Col md={2} className="m-1">
+          Email
+        </Col>
+        <Col md={4} className="m-1">
+          Message
+        </Col>
+        <Col md={1} className="m-1"></Col>
+        <Col md={1} className="m-1"></Col>
+      </Row>
+      {listing.length === 0 && (
+        <tr>
+          <td colSpan="4" className="text-center">
+            <i>No listings found</i>
+          </td>
+        </tr>
+      )}
+      {listing.length >= 0 &&
+        listing.map((entry, index) => (
+          <Form key={entry.entry_id}>
+            <Row>
+              <Col md={1} className="m-1 text-break">
+                {entry.timestamp}
+              </Col>
+              <Col md={2} className="m-1 text-break">
+                <textarea
+                  className="w-100 h-100"
+                  name="name"
+                  type="text"
+                  defaultValue={entry.name}
+                  onChange={(event) =>
+                    changeInputHandler(event, index, entry.entry_id)
+                  }
+                  readOnly={!!entry.readonly ? false : true}
+                  // onBlur={() => handleBlur(index)}
+                />
+              </Col>
+              <Col md={1} className="m-1 text-break">
+                <textarea
+                  className="w-100 h-100"
+                  name="phone"
+                  type="tel"
+                  defaultValue={entry.phone}
+                  onChange={(event) => changeInputHandler(event, index)}
+                  readOnly={!!entry.readonly ? false : true}
+                  // onBlur={() => handleBlur(index)}
+                />
+              </Col>
+              <Col md={2} className="m-1 text-break">
+                <textarea
+                  className="w-100 h-100"
+                  name="email"
+                  type="email"
+                  defaultValue={entry.email}
+                  onChange={(event) => changeInputHandler(event, index)}
+                  readOnly={!!entry.readonly ? false : true}
+                  // onBlur={() => handleBlur(index)}
+                />
+              </Col>
+              <Col md={4} className="m-1 text-break">
+                <textarea
+                  className="w-100 h-100"
+                  type="text"
+                  name="content"
+                  defaultValue={entry.content}
+                  onChange={(event) => changeInputHandler(event, index)}
+                  readOnly={!!entry.readonly ? false : true}
+                  // onBlur={() => handleBlur(index)}
+                />
+              </Col>
+              <Col className="m-auto">
+                {!entry.readonly && (
                   <Button
                     color="primary"
                     onClick={(event) => handleEdit(index)}
                   >
                     &#9998;
                   </Button>
-                </td>
-                <td>
-                  <Button color="danger" onClick={() => handleDelete(index)}>
+                )}
+                {!!entry.readonly && (
+                  <Button
+                    type="submit"
+                    color="primary"
+                    className="p-1"
+                    disabled={!payload ? true : false}
+                    onClick={(event) =>
+                      handleSubmit(event, index, entry.entry_id)
+                    }
+                  >
+                    Submit
+                  </Button>
+                )}
+              </Col>
+              <Col className="m-auto">
+                {!entry.readonly && (
+                  <Button
+                    color="danger"
+                    onClick={() => handleDelete(index, entry.entry_id)}
+                  >
                     X
                   </Button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </Table>
+                )}
+                {!!entry.readonly && (
+                  <Button
+                    color="primary"
+                    className="p-1"
+                    onClick={() => handleBlur(index)}
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </Col>
+            </Row>
+          </Form>
+        ))}
       <Row className="my-5">
         <Button onClick={logout} color="primary">
           Logout
