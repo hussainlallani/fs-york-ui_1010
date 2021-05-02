@@ -15,4 +15,6 @@ const isAuthenticated = () => {
   }
 };
 
+export const isAdmin = () => isAuthenticated().is_admin;
+
 export default isAuthenticated;

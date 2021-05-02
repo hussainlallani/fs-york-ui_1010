@@ -8,6 +8,10 @@ import {
   NavItem,
   NavLink,
   Container,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
 } from "reactstrap";
 import { NavLink as RouteLink } from "react-router-dom";
 
@@ -36,6 +40,25 @@ const Navigation = () => {
               <NavLink tag={RouteLink} to="/contact">
                 Contact Us
               </NavLink>
+            </NavItem>
+            <NavItem>
+              <UncontrolledDropdown nav inNavbar>
+                <DropdownToggle nav caret>
+                  Resume
+                </DropdownToggle>
+                <DropdownMenu right>
+                  <DropdownItem>
+                    <NavLink tag={RouteLink} to="/addresume">
+                      Add
+                    </NavLink>
+                  </DropdownItem>
+                  <DropdownItem>
+                    <NavLink tag={RouteLink} to="/modresume">
+                      Modify
+                    </NavLink>
+                  </DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
             </NavItem>
             <NavItem>
               <NavLink tag={RouteLink} to="/submissions">

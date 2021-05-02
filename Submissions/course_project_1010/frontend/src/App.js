@@ -9,6 +9,8 @@ import Contact from "./components/pages/Contact";
 import Login from "./components/pages/Login";
 import Listing from "./components/pages/Listing";
 import PrivateRoute from "./components/shared/PrivateRoute";
+import AdminRoute from "./components/shared/AdminRoute";
+import AddResume from "./components/private/AddResume";
 
 function App() {
   return (
@@ -19,6 +21,10 @@ function App() {
         <Route exact path="/about" component={About} />
         <Route exact path="/contact" component={Contact} />
         <Route exact path="/login" component={Login} />
+        {/* <Route exact path="/addresume" component={AddResume} /> */}
+        <AdminRoute path="/addresume">
+          <AddResume />
+        </AdminRoute>
         <PrivateRoute path="/submissions">
           <Listing />
         </PrivateRoute>

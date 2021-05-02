@@ -3,7 +3,6 @@ const router = express.Router();
 import { isAuth } from "../middleware/isAuth.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import Joi from "joi";
-// import * as db from "../utilities/jsonHandler.js";
 import bcrypt from "bcrypt";
 import { db } from "../database/connection.js";
 
