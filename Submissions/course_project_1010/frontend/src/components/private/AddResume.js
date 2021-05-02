@@ -96,30 +96,30 @@ const AddResume = () => {
     }));
   };
 
-  // const handleInfoUpdate = async (index, id) => {
-  //   const response = await fetch(
-  //     `http://localhost:${process.env.REACT_APP_SERVERPORT}/resume/info/${username}`,
-  //     {
-  //       method: "PUT",
-  //       headers: {
-  //         Accept: "application/json",
-  //         "Content-Type": "application/json",
-  //         "Access-Control-Allow-Origin": "*",
-  //         "Access-Control-Allow-Credentials": true,
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify(infopayload),
-  //     }
-  //   );
+  const handleInfoUpdate = async (index, id) => {
+    const response = await fetch(
+      `http://localhost:${process.env.REACT_APP_SERVERPORT}/resume/info/${username}`,
+      {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(infopayload),
+      }
+    );
 
-  //   const res = await response.json();
-  //   // alert(JSON.stringify(infopayload));
-  //   if (response.status >= 400) {
-  //     alert(`Oops! Error ${response.status}:  ${res.message}`);
-  //   } else {
-  //     alert(`Successfully Submitted!`);
-  //   }
-  // };
+    const res = await response.json();
+    // alert(JSON.stringify(infopayload));
+    if (response.status >= 400) {
+      alert(`Oops! Error ${response.status}:  ${res.message}`);
+    } else {
+      alert(`Successfully Submitted!`);
+    }
+  };
 
   const handleInfoDelete = async (index, id) => {
     const response = await fetch(
@@ -164,7 +164,6 @@ const AddResume = () => {
               placeholder="Enter first name"
               defaultValue={!!info ? info.fname : ""}
               required
-              // onChange={(e) => setFname(e.target.value)}
               onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
@@ -181,7 +180,6 @@ const AddResume = () => {
               placeholder="Enter last name"
               defaultValue={!!info ? info.lname : ""}
               required
-              // onChange={(e) => setLname(e.target.value)}
               onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
@@ -198,7 +196,6 @@ const AddResume = () => {
               placeholder="Enter role"
               defaultValue={!!info ? info.role : ""}
               required
-              // onChange={(e) => setRole(e.target.value)}
               onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
@@ -217,7 +214,6 @@ const AddResume = () => {
               placeholder="Enter email"
               defaultValue={!!info ? info.email : ""}
               required
-              // onChange={(e) => setEmail(e.target.value)}
               onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
@@ -234,7 +230,6 @@ const AddResume = () => {
               placeholder="Enter phone"
               defaultValue={!!info ? info.phone : ""}
               required
-              // onChange={(e) => setPhone(e.target.value)}
               onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
@@ -251,7 +246,6 @@ const AddResume = () => {
               placeholder="Enter linkedin url"
               defaultValue={!!info ? info.linkedin : ""}
               required
-              // onChange={(e) => setLinkedin(e.target.value)}
               onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
@@ -271,10 +265,7 @@ const AddResume = () => {
         {!!info && isAuthenticated() && (
           <InputGroup row className="text-right py-5">
             <Col sm={11}>
-              <Button
-                color="success"
-                // onClick={(event) => handleInfoUpdate(event)}
-              >
+              <Button color="success" onClick={(e) => handleInfoUpdate(e)}>
                 Update
               </Button>
             </Col>
