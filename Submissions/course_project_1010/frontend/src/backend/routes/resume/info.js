@@ -1,14 +1,14 @@
 import express from "express";
 const router = express.Router();
-import { isAuth } from "../middleware/isAuth.js";
-import { isAdmin } from "../middleware/isAdmin.js";
+import { isAuth } from "../../middleware/isAuth.js";
+import { isAdmin } from "../../middleware/isAdmin.js";
 // import { verifyToken } from "../middleware/jwtVerify.js";
 import Joi from "joi";
 // import * as db from "../utilities/jsonHandler.js";
-import { db } from "../database/connection.js";
+import { db } from "../../database/connection.js";
 
 // Declare primary(param) key
-var pkText = "entry_id";
+var pkText = "username";
 
 router.post("/", async (req, res) => {
   // Validate input
@@ -17,10 +17,10 @@ router.post("/", async (req, res) => {
     return res.status(400).json(error.details[0].message);
   }
 
-  const { name, email, phone, content } = req.body;
+  const { fname, lname, role, email, phone, linkedin, username } = req.body;
 
-  const sql = `INSERT INTO portdb.entries
-    ( name, email, phone, content) VALUES ('${name}','${email}','${phone}', '${content}');`;
+  const sql = `INSERT INTO ${process.env.DBNAME}.info
+    ( fname, lname, role, email, phone, linkedin, username) VALUES ( '${fname}', '${lname}', '${role}', '${email}', '${phone}', '${linkedin}', '${username}')`;
 
   try {
     const result = await db.query(sql);
@@ -30,14 +30,16 @@ router.post("/", async (req, res) => {
       return res.status(400).json(`${pkText}, not created!`);
     }
   } catch (error) {
+    if (error.errno === 1062) return res.status(409).json(error.sqlMessage);
     return res.status(500).json(error);
   }
 });
 
-router.get("/", isAuth, isAdmin, async (req, res) => {
-  const sql = `SELECT entry_id, name, email, phone, content, timestamp
+router.get(`/:${pkText}`, async (req, res) => {
+  const { username } = req.body;
+  const sql = `SELECT username, fname, lname, role, email, phone, linkedin
   FROM
-  ${process.env.DBNAME}.entries;`;
+    ${process.env.DBNAME}.info WHERE ${pkText}='${req.params.username}';`;
 
   try {
     const results = await db.query(sql);
@@ -76,16 +78,15 @@ router.delete(`/:${pkText}`, async (req, res) => {
   }
 });
 
-fname, role, lname, email, phone, linkedin;
-
 function validateContactForm(reqBody) {
   const schemaContactForm = Joi.object({
     fname: Joi.string().min(2).required(),
     lname: Joi.string().min(2).required(),
     role: Joi.string().min(2).required(),
+    username: Joi.string().min(2).required(),
     linkedin: Joi.string().min(2).required(),
     email: Joi.string().min(4).email().required(),
-    phone: Joi.string().length(10).pattern(/^\d+$/).required(),
+    phone: Joi.string().min(10).required(),
   });
 
   return schemaContactForm.validate(reqBody);
