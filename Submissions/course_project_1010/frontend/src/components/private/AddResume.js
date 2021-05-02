@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Form,
-  FormGroup,
   Col,
   Input,
   Button,
@@ -10,19 +9,22 @@ import {
   InputGroupAddon,
   InputGroupText,
 } from "reactstrap";
+import Row from "reactstrap/lib/Row";
 import isAuthenticated from "../../helpers/authHelper";
 
 const AddResume = () => {
-  const [fname, setFname] = useState("");
-  const [lname, setLname] = useState("");
-  const [role, setRole] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [linkedin, setLinkedin] = useState("");
+  // const [fname, setFname] = useState("");
+  // const [lname, setLname] = useState("");
+  // const [role, setRole] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [phone, setPhone] = useState("");
+  // const [linkedin, setLinkedin] = useState("");
   const username = isAuthenticated().username;
   const [info, setInfo] = useState("");
+  const [infopayload, setInfopayload] = useState("");
 
-  const handleSubmit = async (event) => {
+
+  const handleInfoSubmit = async (event) => {
     event.preventDefault();
     console.log(fname, role, lname, email, phone, linkedin, username);
 
@@ -58,7 +60,7 @@ const AddResume = () => {
     if (response.status >= 400) {
       alert(`Oops! Error ${response.status}:  ${payload}`);
     } else {
-      alert(payload);
+      // alert(payload);
     }
 
     setFname("");
@@ -83,11 +85,56 @@ const AddResume = () => {
     getData();
   }, []);
 
-  alert(info.username);
+  const handleInfoUpdate = async (index, id) => {
+    const response = await fetch(
+      `http://localhost:${process.env.REACT_APP_SERVERPORT}/resume/info/${username}`,
+      {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
+    const res = await response.json();
+    if (response.status >= 400) {
+      alert(`Oops! Error ${response.status}:  ${res.message}`);
+    } else {
+      alert(`Successfully Submitted!`);
+    }
+
+
+  const handleInfoDelete = async (index, id) => {
+    const response = await fetch(
+      `http://localhost:${process.env.REACT_APP_SERVERPORT}/resume/info/${username}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": true,
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const res = await response.json();
+    if (response.status >= 400) {
+      alert(`Oops! Error ${response.status}:  ${res.message}`);
+    } else {
+      alert(`Successfully Submitted!`);
+    }
+  };
   return (
     <Container>
-      <Form className="my-5" onSubmit={handleSubmit}>
+      <Form className="my-5">
         <h1>Personal Information</h1>
         <InputGroup row className="py-5">
           <Col sm={1}>
@@ -101,9 +148,10 @@ const AddResume = () => {
               name="fname"
               id="fname"
               placeholder="Enter first name"
-              defaultValue={info.fname}
+              defaultValue={!!info ? info.fname : ""}
               required
-              onChange={(e) => setFname(e.target.value)}
+              // onChange={(e) => setFname(e.target.value)}
+              onChange={handleInfoSubmit}
             />
           </Col>
           <Col sm={1}>
@@ -117,9 +165,10 @@ const AddResume = () => {
               name="lname"
               id="lname"
               placeholder="Enter last name"
-              defaultValue={info.lname}
+              defaultValue={!!info ? info.lname : ""}
               required
-              onChange={(e) => setLname(e.target.value)}
+              // onChange={(e) => setLname(e.target.value)}
+              onChange={handleInfoSubmit}
             />
           </Col>
           <Col sm={1}>
@@ -133,13 +182,13 @@ const AddResume = () => {
               name="role"
               id="role"
               placeholder="Enter role"
-              defaultValue={info.role}
+              defaultValue={!!info ? info.role : ""}
               required
-              onChange={(e) => setRole(e.target.value)}
+              // onChange={(e) => setRole(e.target.value)}
+              onChange={handleInfoSubmit}
             />
           </Col>
         </InputGroup>
-
         <InputGroup row>
           <Col sm={1}>
             <InputGroupAddon addonType="prepend">
@@ -152,9 +201,10 @@ const AddResume = () => {
               name="email"
               id="email"
               placeholder="Enter email"
-              defaultValue={info.email}
+              defaultValue={!!info ? info.email : ""}
               required
-              onChange={(e) => setEmail(e.target.value)}
+              // onChange={(e) => setEmail(e.target.value)}
+              onChange={handleInfoSubmit}
             />
           </Col>
           <Col sm={1}>
@@ -168,9 +218,10 @@ const AddResume = () => {
               name="phone"
               id="phone"
               placeholder="Enter phone"
-              defaultValue={info.phone}
+              defaultValue={!!info ? info.phone : ""}
               required
-              onChange={(e) => setPhone(e.target.value)}
+              // onChange={(e) => setPhone(e.target.value)}
+              onChange={handleInfoSubmit}
             />
           </Col>
           <Col sm={1}>
@@ -184,64 +235,45 @@ const AddResume = () => {
               name="linkedin"
               id="linkedin"
               placeholder="Enter linkedin url"
-              defaultValue={info.linkedin}
+              defaultValue={!!info ? info.linkedin : ""}
               required
-              onChange={(e) => setLinkedin(e.target.value)}
+              // onChange={(e) => setLinkedin(e.target.value)}
+              onChange={handleInfoSubmit}
             />
           </Col>
         </InputGroup>
-
-        {/* <FormGroup row>
-          <Label for="fname" sm={2}>
-            First Name
-          </Label>
-          <Col sm={2}>
-            <Input
-              type="text"
-              name="fname"
-              id="fname"
-              placeholder="Enter first name"
-              required
-              onChange={(e) => setFname(e.target.value)}
-            />
-          </Col>
-          <Label for="lname" sm={2}>
-            Last Name
-          </Label>
-          <Col sm={2}>
-            <Input
-              type="text"
-              name="lname"
-              id="lname"
-              placeholder="Enter last name"
-              required
-              onChange={(e) => setLname(e.target.value)}
-            />
-          </Col>
-          <Label for="role" sm={2}>
-            Role
-          </Label>
-          <Col sm={2}>
-            <Input
-              type="text"
-              name="role"
-              id="role"
-              placeholder="Enter role"
-              required
-              onChange={(e) => setRole(e.target.value)}
-            />
-          </Col>
-        </FormGroup>
-        <FormGroup row></FormGroup>
-        <FormGroup row></FormGroup> */}
-
-        <FormGroup check row>
-          <Col sm={{ size: 10, offset: 2 }}>
-            <Button color="success" type="submit">
-              Submit
-            </Button>
-          </Col>
-        </FormGroup>
+        {!!!info && isAuthenticated() && (
+          <InputGroup row className="text-right py-5">
+            <Col sm={12}>
+              <Button
+                color="success"
+                onClick={(event) => handleInfoSubmit(event)}
+              >
+                Add
+              </Button>
+            </Col>
+          </InputGroup>
+        )}
+        {!!info && isAuthenticated() && (
+          <InputGroup row className="text-right py-5">
+            <Col sm={11}>
+              <Button
+                color="success"
+                onClick={(event) => handleInfoUpdate(event)}
+              >
+                Update
+              </Button>
+            </Col>
+            <Col sm={1}>
+              <Button
+                color="danger"
+                onClick={(event) => handleInfoDelete(event)}
+              >
+                Delete
+              </Button>
+            </Col>
+          </InputGroup>
+        )}
       </Form>
     </Container>
   );

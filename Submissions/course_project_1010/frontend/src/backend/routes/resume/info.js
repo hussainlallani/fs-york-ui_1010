@@ -69,7 +69,7 @@ router.put(`/:${pkText}`, async (req, res) => {
 });
 
 router.delete(`/:${pkText}`, async (req, res) => {
-  const sql = `DELETE FROM ${process.env.DBNAME}.entries WHERE ${pkText}='${req.params[pkText]}';`;
+  const sql = `DELETE FROM ${process.env.DBNAME}.info WHERE ${pkText}='${req.params[pkText]}';`;
   try {
     const results = await db.query(sql);
     dbStatus(res, results);
