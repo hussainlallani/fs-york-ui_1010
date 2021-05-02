@@ -9,20 +9,20 @@ import {
   InputGroupAddon,
   InputGroupText,
 } from "reactstrap";
-import Row from "reactstrap/lib/Row";
 import isAuthenticated from "../../helpers/authHelper";
 
-const AddResume = () => {
-  // const [fname, setFname] = useState("");
-  // const [lname, setLname] = useState("");
-  // const [role, setRole] = useState("");
-  // const [email, setEmail] = useState("");
-  // const [phone, setPhone] = useState("");
-  // const [linkedin, setLinkedin] = useState("");
-  const username = isAuthenticated().username;
-  const [info, setInfo] = useState("");
-  const [infopayload, setInfopayload] = useState("");
+var token = isAuthenticated();
 
+const AddResume = () => {
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
+  const [role, setRole] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [info, setInfo] = useState();
+  const [infopayload, setInfopayload] = useState("");
+  var username = isAuthenticated().username;
 
   const handleInfoSubmit = async (event) => {
     event.preventDefault();
@@ -39,16 +39,18 @@ const AddResume = () => {
           "Access-Control-Allow-Credentials": true,
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          fname,
-          lname,
-          role,
-          email,
-          phone,
-          linkedin,
-          username,
-        }),
+        // body: JSON.stringify({
+        //   fname,
+        //   lname,
+        //   role,
+        //   email,
+        //   phone,
+        //   linkedin,
+        //   username,
+        // }),
+        body: JSON.stringify(infopayload),
       });
+      setInfo("");
       var payload = await response.json();
       console.log(payload);
     } catch (error) {
@@ -83,31 +85,41 @@ const AddResume = () => {
       setInfo(...payload);
     };
     getData();
-  }, []);
+  }, [info]);
 
-  const handleInfoUpdate = async (index, id) => {
-    const response = await fetch(
-      `http://localhost:${process.env.REACT_APP_SERVERPORT}/resume/info/${username}`,
-      {
-        method: "PUT",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": true,
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+  const changeInfoHandler = async (event, index, id) => {
+    event.persist();
+    setInfopayload((prevState) => ({
+      ...prevState,
+      username: `${username.toString()}`,
+      [event.target.name]: event.target.value,
+    }));
+  };
 
-    const res = await response.json();
-    if (response.status >= 400) {
-      alert(`Oops! Error ${response.status}:  ${res.message}`);
-    } else {
-      alert(`Successfully Submitted!`);
-    }
+  // const handleInfoUpdate = async (index, id) => {
+  //   const response = await fetch(
+  //     `http://localhost:${process.env.REACT_APP_SERVERPORT}/resume/info/${username}`,
+  //     {
+  //       method: "PUT",
+  //       headers: {
+  //         Accept: "application/json",
+  //         "Content-Type": "application/json",
+  //         "Access-Control-Allow-Origin": "*",
+  //         "Access-Control-Allow-Credentials": true,
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify(infopayload),
+  //     }
+  //   );
 
+  //   const res = await response.json();
+  //   // alert(JSON.stringify(infopayload));
+  //   if (response.status >= 400) {
+  //     alert(`Oops! Error ${response.status}:  ${res.message}`);
+  //   } else {
+  //     alert(`Successfully Submitted!`);
+  //   }
+  // };
 
   const handleInfoDelete = async (index, id) => {
     const response = await fetch(
@@ -121,17 +133,19 @@ const AddResume = () => {
           "Access-Control-Allow-Credentials": true,
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
       }
     );
+
+    setInfo("");
 
     const res = await response.json();
     if (response.status >= 400) {
       alert(`Oops! Error ${response.status}:  ${res.message}`);
     } else {
-      alert(`Successfully Submitted!`);
+      alert(`${res}`);
     }
   };
+
   return (
     <Container>
       <Form className="my-5">
@@ -151,7 +165,7 @@ const AddResume = () => {
               defaultValue={!!info ? info.fname : ""}
               required
               // onChange={(e) => setFname(e.target.value)}
-              onChange={handleInfoSubmit}
+              onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
           <Col sm={1}>
@@ -168,7 +182,7 @@ const AddResume = () => {
               defaultValue={!!info ? info.lname : ""}
               required
               // onChange={(e) => setLname(e.target.value)}
-              onChange={handleInfoSubmit}
+              onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
           <Col sm={1}>
@@ -185,7 +199,7 @@ const AddResume = () => {
               defaultValue={!!info ? info.role : ""}
               required
               // onChange={(e) => setRole(e.target.value)}
-              onChange={handleInfoSubmit}
+              onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
         </InputGroup>
@@ -204,7 +218,7 @@ const AddResume = () => {
               defaultValue={!!info ? info.email : ""}
               required
               // onChange={(e) => setEmail(e.target.value)}
-              onChange={handleInfoSubmit}
+              onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
           <Col sm={1}>
@@ -221,7 +235,7 @@ const AddResume = () => {
               defaultValue={!!info ? info.phone : ""}
               required
               // onChange={(e) => setPhone(e.target.value)}
-              onChange={handleInfoSubmit}
+              onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
           <Col sm={1}>
@@ -238,7 +252,7 @@ const AddResume = () => {
               defaultValue={!!info ? info.linkedin : ""}
               required
               // onChange={(e) => setLinkedin(e.target.value)}
-              onChange={handleInfoSubmit}
+              onChange={(e) => changeInfoHandler(e)}
             />
           </Col>
         </InputGroup>
@@ -259,7 +273,7 @@ const AddResume = () => {
             <Col sm={11}>
               <Button
                 color="success"
-                onClick={(event) => handleInfoUpdate(event)}
+                // onClick={(event) => handleInfoUpdate(event)}
               >
                 Update
               </Button>
