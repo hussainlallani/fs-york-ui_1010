@@ -1,13 +1,13 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import isAuthenticated from "../../helpers/authHelper";
+import { isAdmin } from "../../helpers/authHelper";
 
-const PrivateRoute = ({ children, ...rest }) => {
+const AdminRoute = ({ children, ...rest }) => {
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        isAuthenticated() ? (
+        !!isAdmin() ? (
           children
         ) : (
           <Redirect to={{ pathname: "/login", state: { from: location } }} />
@@ -17,4 +17,4 @@ const PrivateRoute = ({ children, ...rest }) => {
   );
 };
 
-export default PrivateRoute;
+export default AdminRoute;

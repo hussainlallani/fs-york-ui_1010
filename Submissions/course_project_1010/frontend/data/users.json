@@ -1,0 +1,54 @@
+[
+  {
+    "id": 842621136204,
+    "email": "addre1336@email.com",
+    "password": "$2b$10$RZtHOT0fTXMUV0KpXoDhruH6OPBZYr.2ECXkAu4/x4oUOn88Ng/VW"
+  },
+  {
+    "id": 241962110357,
+    "email": "addre1332@email.com",
+    "password": "$2b$10$F53Zdqqrcz6rVAWBtHVNiuYJWMfIXXQCY3xhFauijbM3t2A1V6J5i"
+  },
+  {
+    "id": 1579128170452,
+    "email": "addre13336@email.com",
+    "password": "$2b$10$Y0y6riBHdBYK3To5VUyP6eWt55hjc1zCoL5i2AC8YKCEWvTn9GkCu"
+  },
+  {
+    "id": 1154965304633,
+    "email": "admin@admin.com",
+    "password": "$2b$10$.xH1.0hB.SMxE8KAZf01guoA1rHeMn/hD.nngIoYMtdzARQR0ctWa"
+  },
+  {
+    "id": 1202513324683,
+    "email": "admin1@admin.com",
+    "password": "$2b$10$x5F821gyS61fpAE2b8/Hiub1NhqKqroQecQdQoyfNmQEmm9Isnhzy"
+  },
+  {
+    "id": 90465890132,
+    "email": "admin5@admin.com",
+    "password": "$2b$10$TKs0Z3lKCldFr7mc1x.Zdea0c//aishFtsps0JwxW.N/EIgUrQzEK"
+  },
+  {
+    "id": 1066768904025,
+    "email": "addre13339@email.com",
+    "password": "$2b$10$T4mwqJYlt.FLU0KUZst4weeXgHCDFc5jJDLi1o9S8hP74FKehyWTi"
+  },
+  {
+    "id": 508870333401,
+    "email": "007@email.com",
+    "password": "$2b$10$MHBHlsgKj77/zrhqUUmuFu3SJKYouf7/ZQ44eR2EKHsXn.0VzcUc."
+  },
+  {
+    "id": 1508454258821,
+    "email": "0007@email.com",
+    "password": "$2b$10$ylrXJ3ZkTV7aLWNQASmg2ORR67QB2jl7WX2cx43f.tl77pMHVyWq.",
+    "isAdmin": "true"
+  },
+  {
+    "id": 927301601727,
+    "email": "admin007@admin.com",
+    "password": "$2b$10$1794Zbhvf1IH9wmuRe7UxelpKCw4aBT5ObxpuqDI7vVKo5q4QjAQm",
+    "isAdmin": "true"
+  }
+]
