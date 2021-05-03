@@ -48,67 +48,280 @@ SQL Statements
 Note: the following files are all in the folder emr-app > src > routes
 File Name: entries.js
 
-Line : 22 - 23
+Line : 20 - 34
+const { name, email, phone, content } = req.body;
+
 const sql = `INSERT INTO portdb.entries ( name, email, phone, content) VALUES ('${name}','${email}','${phone}', '${content}');`;
 
-Line : 38 - 40
+try {
+const result = await db.query(sql);
+if (result.affectedRows !== 0) {
+return res.status(200).json(`${pkText}, successfully created!`);
+} else {
+return res.status(400).json(`${pkText}, not created!`);
+}
+} catch (error) {
+return res.status(500).json(error);
+}
+
+Line : 38 - 47
 const sql = `SELECT entry_id, name, email, phone, content, timestamp FROM ${process.env.DBNAME}.entries;`;
 
-Line: 56 : 58
+try {
+const results = await db.query(sql);
+return res.status(200).send(results);
+} catch (error) {
+return res.status(404).json(error.message);
+}
+
+Line: 51 : 66
+let query = [];
+Object.entries(req.body).map((entry) => {
+query.push(`${entry[0]} = '${entry[1]}'`);
+});
+
 const sql = `UPDATE ${process.env.DBNAME}.entries SET ${query} WHERE ${pkText}='${req.params[pkText]}';`;
 
-Line 70:
+// Apply update
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+return res.status(500).json(error);
+}
+
+Line 70:76
 const sql = `DELETE FROM ${process.env.DBNAME}.entries WHERE ${pkText}='${req.params[pkText]}';`;
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+return res.status(404).json(error);
+}
 
 File Name: users.js
 
-Line : 40 -42
-const sql = `SELECT username, is_admin FROM ${process.env.DBNAME}.users;`;
+Line : 19 -36
+let { username, password, is_admin } = req.body;
 
-Line : 65 - 67
+const sql = (hashedPwd) => {
+return `INSERT INTO ${process.env.DBNAME}.users ( username, password, is_admin) VALUES ('${username}','${hashedPwd}',${is_admin})`;
+};
+
+try {
+// Hash Password
+const hashedPwd = await hashPwd(password);
+const results = await db.query(sql(hashedPwd));
+dbStatus(res, results);
+} catch (error) {
+if (error.errno === 1062) {
+return res.status(409).json(error.message);
+}
+return res.status(500).json(error);
+}
+
+Line : 40 - 50
+let { username, password, is_admin } = req.body;
+
+const sql = (hashedPwd) => {
+return `INSERT INTO ${process.env.DBNAME}.users ( username, password, is_admin) VALUES ('${username}','${hashedPwd}',${is_admin})`;
+};
+
+try {
+// Hash Password
+const hashedPwd = await hashPwd(password);
+const results = await db.query(sql(hashedPwd));
+dbStatus(res, results);
+} catch (error) {
+if (error.errno === 1062) {
+return res.status(409).json(error.message);
+}
+return res.status(500).json(error);
+}
+
+Line 60:75
+const { username, is_admin } = req.body;
+
+// Get payload
+const payload = { username, is_admin };
+
 const sql = `UPDATE ${process.env.DBNAME}.users SET is_admin = ${is_admin} WHERE ${pkText}='${req.params[pkText]}';`;
 
-Line 79:
+// Apply update
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+return res.status(500).json(error);
+}
+
+Line 79:86
 const sql = `DELETE FROM ${process.env.DBNAME}.users WHERE ${pkText}='${req.params[pkText]}';`;
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+console.log(error);
+return res.status(404).json(error);
+}
 
 File Name: info.js
-Line Number: 22 - 23
+Line Number: 20 - 36
+const { fname, lname, role, email, phone, linkedin, username } = req.body;
+
 const sql = `INSERT INTO ${process.env.DBNAME}.info ( fname, lname, role, email, phone, linkedin, username) VALUES ( '${fname}', '${lname}', '${role}', '${email}', '${phone}', '${linkedin}', '${username}')`;
 
-Line : 40 - 42
+try {
+const result = await db.query(sql);
+if (result.affectedRows !== 0) {
+return res.status(200).json(`${pkText}, successfully created!`);
+} else {
+return res.status(400).json(`${pkText}, not created!`);
+}
+} catch (error) {
+if (error.errno === 1062) return res.status(409).json(error.sqlMessage);
+return res.status(500).json(error);
+}
+});
+
+Line : 39 - 49
+const { username } = req.body;
 const sql = `SELECT username, fname, lname, role, email, phone, linkedin FROM ${process.env.DBNAME}.info WHERE ${pkText}='${req.params.username}';`;
 
-Line : 58:60
+try {
+const results = await db.query(sql);
+return res.status(200).send(results);
+} catch (error) {
+return res.status(404).json(error.message);
+}
+
+Line : 53:68
+let query = [];
+Object.entries(req.body).map((entry) => {
+query.push(`${entry[0]} = '${entry[1]}'`);
+});
+
 const sql = `UPDATE ${process.env.DBNAME}.info SET ${query} WHERE ${pkText}='${req.params[pkText]}';`;
 
-Line 72:
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+return res.status(500).json(error);
+}
+
+Line 72-77:
 const sql = `DELETE FROM ${process.env.DBNAME}.info WHERE ${pkText}='${req.params[pkText]}';`;
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+return res.status(404).json(error);
 
 File Name: education.js
-Line 22:23
+Line 20:31
+const { course_degree, from_to, place_of_study, username } = req.body;
+
 const sql = `INSERT INTO ${process.env.DBNAME}.education ( course_degree, from_to, place_of_study, username) VALUES ( '${course_degree}', '${from_to}', '${place_of_study}', '${username}')`;
 
-Line 40:41
+try {
+const result = await db.query(sql);
+if (result.affectedRows !== 0) {
+return res.status(200).json(`${pkText}, successfully created!`);
+} else {
+return res.status(400).json(`${pkText}, not created!`);
+}
+
+Line 39:48
+const { username } = req.body;
 const sql = `SELECT education_id, course_degree, from_to, place_of_study, username FROM ${process.env.DBNAME}.education WHERE ${pkText} = '${req.params[pkText]}';`;
 
-Line : 57
+try {
+const results = await db.query(sql);
+return res.status(200).send(results);
+} catch (error) {
+return res.status(404).json(error.message);
+}
+
+Line : 52-66
+let query = [];
+Object.entries(req.body).map((entry) => {
+query.push(`${entry[0]} = '${entry[1]}'`);
+});
+
 const sql = `UPDATE ${process.env.DBNAME}.education SET ${query} WHERE education_id=${req.params.education_id} && username='${req.params.username}';`;
 
-Line : 70
+// Apply update
+try {
+const results = await db.query(sql);
+console.log(results);
+dbStatus(res, results);
+} catch (error) {
+return res.status(500).json(error);
+}
+
+Line : 70-76
 const sql = `DELETE FROM ${process.env.DBNAME}.info WHERE ${pkText}='${req.params[pkText]}';`;
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+return res.status(404).json(error);
+}
 
 Filename: summary.js
-Line 22:23
+Line 20:35
+const { summary, username } = req.body;
+
 const sql = `INSERT INTO ${process.env.DBNAME}.summary ( summary, username) VALUES ( '${summary}', '${username}')`;
 
-Line 40:42
+try {
+const result = await db.query(sql);
+if (result.affectedRows !== 0) {
+return res.status(200).json(`Database updated!`);
+} else {
+return res.status(400).json(`Database failed to be updated!`);
+}
+} catch (error) {
+if (error.errno === 1062) return res.status(409).json(error.sqlMessage);
+return res.status(500).json(error);
+}
+
+Line 39:49
+const { username } = req.body;
 const sql = `SELECT summary FROM ${process.env.DBNAME}.summary WHERE ${pkText}='${req.params.username}';`;
 
-Line 58:60
+try {
+const results = await db.query(sql);
+return res.status(200).send(results);
+} catch (error) {
+return res.status(404).json(error.message);
+}
+
+Line 53:68
+let query = [];
+Object.entries(req.body).map((entry) => {
+query.push(`${entry[0]} = '${entry[1]}'`);
+});
+
 const sql = `UPDATE ${process.env.DBNAME}.summary SET ${query} WHERE ${pkText}='${req.params[pkText]}';`;
 
-Line : 72
+// Apply update
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+return res.status(500).json(error);
+}
+
+Line : 72:78
 const sql = `DELETE FROM ${process.env.DBNAME}.summary WHERE ${pkText}='${req.params[pkText]}';`;
+try {
+const results = await db.query(sql);
+dbStatus(res, results);
+} catch (error) {
+return res.status(404).json(error);
+}
 
 Works in Progress
 Note: there are still some console.logs and alerts in the code for testing purposes.
