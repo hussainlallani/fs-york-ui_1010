@@ -5,6 +5,7 @@ import users from "./src/backend/routes/users.js";
 import entries from "./src/backend/routes/entries.js";
 import info from "./src/backend/routes/resume/info.js";
 import summary from "./src/backend/routes/resume/summary.js";
+import experience from "./src/backend/routes/resume/experience.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -21,6 +22,7 @@ app.use("/contact_form/entries", entries);
 app.use("/users", users);
 app.use("/resume/info", info);
 app.use("/resume/summary", summary);
+app.use("/resume/experience", experience);
 
 app.get("*", (req, res) => {
   const err = new Error("An invalid URL");

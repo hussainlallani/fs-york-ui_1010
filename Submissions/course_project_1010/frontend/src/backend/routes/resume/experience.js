@@ -17,28 +17,36 @@ router.post("/", async (req, res) => {
   //   return res.status(400).json(error.details[0].message);
   // }
 
-  const { course_degree, from_to, place_of_study, username } = req.body;
+  const { company_and_role, from_to, job_resp, username } = req.body;
 
-  const sql = `INSERT INTO ${process.env.DBNAME}.education
-    ( course_degree, from_to, place_of_study, username) VALUES ( '${course_degree}', '${from_to}', '${place_of_study}', '${username}')`;
+  const sql1 = `INSERT INTO ${process.env.DBNAME}.experiences (company_and_role, from_to, username) VALUES ( "${company_and_role}", "${from_to}", "${username}");`;
+
+  const sql2 = `SET @EXP_ID = LAST_INSERT_ID();`;
+
+  const sql3 = `INSERT INTO ${process.env.DBNAME}.job_resp (job_resp) VALUES ( "${job_resp}" );`;
+
+  const sql4 = `SET @RESP_ID = LAST_INSERT_ID();`;
+
+  const sql5 = `INSERT INTO ${process.env.DBNAME}.job_desc_resp (experience_id,job_resp_id) VALUES ( @EXP_ID, @RESP_ID );`;
 
   try {
-    const result = await db.query(sql);
-    if (result.affectedRows !== 0) {
-      return res.status(200).json(`${pkText}, successfully created!`);
-    } else {
-      return res.status(400).json(`${pkText}, not created!`);
-    }
+    await db.beginTransaction();
+    await db.query(sql1);
+    await db.query(sql2);
+    await db.query(sql3);
+    await db.query(sql4);
+    const results = await db.query(sql5);
+    await db.commit();
+    dbStatus(res, results);
   } catch (error) {
     if (error.errno === 1062) return res.status(409).json(error.sqlMessage);
+    console.log(error);
     return res.status(500).json(error);
   }
 });
 
 router.get(`/:${pkText}`, async (req, res) => {
-  const { username } = req.body;
-  const sql = `SELECT education_id, course_degree, from_to, place_of_study, username
-  FROM ${process.env.DBNAME}.education WHERE ${pkText} = '${req.params[pkText]}';`;
+  const sql = `SELECT experience_id, company_and_role, from_to FROM ${process.env.DBNAME}.experiences WHERE username='${req.params[pkText]}';`;
 
   try {
     const results = await db.query(sql);
@@ -48,13 +56,15 @@ router.get(`/:${pkText}`, async (req, res) => {
   }
 });
 
-router.put(`/:${pkText}/:education_id`, async (req, res) => {
+router.put(`/:${pkText}`, async (req, res) => {
   let query = [];
   Object.entries(req.body).map((entry) => {
     query.push(`${entry[0]} = '${entry[1]}'`);
   });
 
-  const sql = `UPDATE ${process.env.DBNAME}.education SET ${query} WHERE education_id=${req.params.education_id} && username='${req.params.username}';`;
+  const sql = `UPDATE ${process.env.DBNAME}.info 
+    SET ${query} 
+    WHERE ${pkText}='${req.params[pkText]}';`;
 
   // Apply update
   try {
@@ -75,19 +85,19 @@ router.delete(`/:${pkText}`, async (req, res) => {
   }
 });
 
-// function validateContactForm(reqBody) {
-//   const schemaContactForm = Joi.object({
-//     fname: Joi.string().min(2).required(),
-//     lname: Joi.string().min(2).required(),
-//     role: Joi.string().min(2).required(),
-//     username: Joi.string().min(2).required(),
-//     linkedin: Joi.string().min(2).required(),
-//     email: Joi.string().min(4).email().required(),
-//     phone: Joi.string().min(10).required(),
-//   });
+function validateContactForm(reqBody) {
+  const schemaContactForm = Joi.object({
+    fname: Joi.string().min(2).required(),
+    lname: Joi.string().min(2).required(),
+    role: Joi.string().min(2).required(),
+    username: Joi.string().min(2).required(),
+    linkedin: Joi.string().min(2).required(),
+    email: Joi.string().min(4).email().required(),
+    phone: Joi.string().min(10).required(),
+  });
 
-//   return schemaContactForm.validate(reqBody);
-// }
+  return schemaContactForm.validate(reqBody);
+}
 
 const dbStatus = (res, results) => {
   if (results.affectedRows !== 0)
