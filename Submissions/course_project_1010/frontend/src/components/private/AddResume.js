@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   Form,
   Col,
-  Input,
+  // Input,np
   Button,
   Container,
   InputGroup,
@@ -10,9 +10,25 @@ import {
   InputGroupText,
   Alert,
 } from "reactstrap";
-// import Input from "@material-ui/core/Input";
+import Input from "@material-ui/core/Input";
+import TextField from "@material-ui/core/TextField";
 // import TextField from "@material-ui/core/TextField";
 import isAuthenticated from "../../helpers/authHelper";
+import Grid from "@material-ui/core/Grid";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    padding: theme.spacing(0, 0, 0, 20),
+    // textAlign: "center",
+  },
+  paper: {
+    padding: theme.spacing(1),
+    textAlign: "center",
+    color: theme.palette.text.secondary,
+  },
+}));
 
 var token = isAuthenticated();
 
@@ -24,7 +40,7 @@ const AddResume = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [linkedin, setLinkedin] = useState("");
-  const [info, setInfo] = useState();
+  const [info, setInfo] = useState([]);
   const [data, setData] = useState({
     email: "",
     fname: "",
@@ -94,6 +110,7 @@ const AddResume = () => {
         }
       );
       const payload = await response.json();
+      console.log(payload);
       setInfo(...payload);
     };
     getData();
@@ -206,6 +223,7 @@ const AddResume = () => {
       );
       const payload = await response.json();
       setSummary(...payload);
+      console.log(summary);
     };
     getData();
   }, []);
@@ -384,268 +402,128 @@ const AddResume = () => {
     }
   };
 
+  const classes = useStyles();
+
   return (
-    <Container>
-      {/* INFO SECTION */}
-      <Form className="my-5">
-        <h1>Personal Information</h1>
-        <InputGroup row className="py-5">
-          <Col sm={1}>
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText className="pr-5">First Name</InputGroupText>
-            </InputGroupAddon>
-          </Col>
-          <Col sm={3}>
-            <Input
-              type="text"
-              name="fname"
-              id="fname"
-              placeholder="Enter first name"
-              defaultValue={!!info ? info.fname : ""}
-              required
-              onChange={(e) => changeInfoHandler(e)}
-            />
-          </Col>
-          <Col sm={1}>
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText className="pr-5">Last Name</InputGroupText>
-            </InputGroupAddon>
-          </Col>
-          <Col sm={3}>
-            <Input
-              type="text"
-              name="lname"
-              id="lname"
-              placeholder="Enter last name"
-              defaultValue={!!info ? info.lname : ""}
-              required
-              onChange={(e) => changeInfoHandler(e)}
-            />
-          </Col>
-          <Col sm={1}>
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText className="pr-5">Role</InputGroupText>
-            </InputGroupAddon>
-          </Col>
-          <Col sm={3}>
-            <Input
-              type="text"
-              name="role"
-              id="role"
-              placeholder="Enter role"
-              defaultValue={!!info ? info.role : ""}
-              required
-              onChange={(e) => changeInfoHandler(e)}
-            />
-          </Col>
-        </InputGroup>
-        <InputGroup row>
-          <Col sm={1}>
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText className="pr-5">Email</InputGroupText>
-            </InputGroupAddon>
-          </Col>
-          <Col sm={3}>
-            <Input
-              type="text"
-              name="email"
-              id="email"
-              placeholder="Enter email"
-              defaultValue={!!info ? info.email : ""}
-              required
-              onChange={(e) => changeInfoHandler(e)}
-            />
-          </Col>
-          <Col sm={1}>
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText className="pr-5">Phone</InputGroupText>
-            </InputGroupAddon>
-          </Col>
-          <Col sm={3}>
-            <Input
-              type="text"
-              name="phone"
-              id="phone"
-              placeholder="Enter phone"
-              defaultValue={!!info ? info.phone : ""}
-              required
-              onChange={(e) => changeInfoHandler(e)}
-            />
-          </Col>
-          <Col sm={1}>
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText className="pr-5">LinkedIn</InputGroupText>
-            </InputGroupAddon>
-          </Col>
-          <Col sm={3}>
-            <Input
-              type="text"
-              name="linkedin"
-              id="linkedin"
-              placeholder="Enter linkedin url"
-              defaultValue={!!info ? info.linkedin : ""}
-              required
-              onChange={(e) => changeInfoHandler(e)}
-            />
-          </Col>
-        </InputGroup>
-        {!!!info && isAuthenticated() && (
-          <InputGroup row className="text-right py-5">
-            <Col sm={12}>
-              <Button
-                color="success"
-                onClick={(event) => handleInfoSubmit(event)}
-              >
-                Add
-              </Button>
-            </Col>
-          </InputGroup>
-        )}
-        {!!info && isAuthenticated() && (
-          <InputGroup row className="text-right py-5">
-            <Col sm={11}>
-              <Button color="success" onClick={(e) => handleInfoUpdate(e)}>
-                Update
-              </Button>
-            </Col>
-            <Col sm={1}>
-              <Button
-                color="danger"
-                onClick={(event) => handleInfoDelete(event)}
-              >
-                Delete
-              </Button>
-            </Col>
-          </InputGroup>
-        )}
-      </Form>
-      {/* <h1>First Name: {info}</h1> */}
-      {/* SUMMARY SECTION */}
-      <Form className="my-5">
-        <h1>Summary</h1>
-        <InputGroup row className="py-5">
-          <Col sm={12}>
-            <textarea
-              className="w-100"
-              type="text"
-              name="summary"
-              id="summary"
-              placeholder="Enter summary"
-              defaultValue={!!summary ? summary.summary : ""}
-              required
-              onChange={(e) => changeSummaryHandler(e)}
-            />
-          </Col>
-        </InputGroup>
-        {!!!summary && isAuthenticated() && (
-          <InputGroup row className="text-right">
-            <Col sm={12}>
-              <Button
-                color="success"
-                onClick={(event) => handleSummarySubmit(event)}
-              >
-                Add
-              </Button>
-            </Col>
-          </InputGroup>
-        )}
-        {!!summary && isAuthenticated() && (
-          <InputGroup row className="text-right">
-            <Col sm={11}>
-              <Button color="success" onClick={(e) => handleSummaryUpdate(e)}>
-                Update
-              </Button>
-            </Col>
-            <Col sm={1}>
-              <Button
-                color="danger"
-                onClick={(event) => handleSummaryDelete(event)}
-              >
-                Delete
-              </Button>
-            </Col>
-          </InputGroup>
-        )}
-      </Form>
-      {/* EXPERIENCE */}
-      <Form className="my-5">
-        <h1>Experience</h1>
-        {/* {!!experience[0] ? experience[0].from_to : ""} */}
+    <div className={classes.root}>
+      <Grid container spacing={1}>
+        {/* INFO SECTION */}
+        <Form key={info} className={classes.root}>
+          <h1 className="py-5">Personal Information</h1>
+          <Grid container item xs={12} spacing={3}>
+            <Grid item xs={4}>
+              <TextField
+                type="text"
+                inputProps={{ className: "text-white" }}
+                InputLabelProps={{ className: "text-white" }}
+                label="First Name"
+                name="fname"
+                id="fname"
+                variant="outlined"
+                defaultValue={info.fname}
+                required
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                type="text"
+                inputProps={{ className: "text-white" }}
+                InputLabelProps={{ className: "text-white" }}
+                label="Last Name"
+                name="lname"
+                id=";name"
+                variant="outlined"
+                defaultValue={info.lname}
+                required
+                onChange={(e) => changeInfoHandler(e)}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                type="text"
+                inputProps={{ className: "text-white" }}
+                InputLabelProps={{ className: "text-white" }}
+                label="Role"
+                name="Role"
+                id="role"
+                variant="outlined"
+                defaultValue={info.role}
+                required
+                onChange={(e) => changeInfoHandler(e)}
+              />
+            </Grid>
+          </Grid>
+          <Grid container item xs={12} spacing={3}>
+            <Grid item xs={4}>
+              <TextField
+                type="text"
+                inputProps={{ className: "text-white" }}
+                InputLabelProps={{ className: "text-white" }}
+                label="Email"
+                name="Email"
+                id="Email"
+                variant="outlined"
+                defaultValue={info.email}
+                required
+                onChange={(e) => changeInfoHandler(e)}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                type="text"
+                inputProps={{ className: "text-white" }}
+                InputLabelProps={{ className: "text-white" }}
+                label="Phone"
+                name="Phone"
+                id="Phone"
+                variant="outlined"
+                defaultValue={info.phone}
+                required
+                onChange={(e) => changeInfoHandler(e)}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <TextField
+                type="text"
+                inputProps={{ className: "text-white" }}
+                InputLabelProps={{ className: "text-white" }}
+                label="LinkedIn"
+                name="LinkedIn"
+                id="LinkedIn"
+                variant="outlined"
+                defaultValue={info.linkedin}
+                required
+                onChange={(e) => changeInfoHandler(e)}
+              />
+            </Grid>
+          </Grid>
 
-        {experience.length > 0 &&
-          experience.map((exp) => (
-            <div key={exp.experience_id}>
-              <p>{exp.experience_id}</p>
-              <p>{exp.company_and_role}</p>
-              <p>{exp.from_to}</p>
-            </div>
-          ))}
-
-        <InputGroup row className="py-5">
-          <Col sm={1}>
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText className="pr-5">Company & Role</InputGroupText>
-            </InputGroupAddon>
-          </Col>
-          <Col sm={3}>
-            <Input
-              type="text"
-              name="company_and_role"
-              id="company_and_role"
-              placeholder="Enter company and role"
-              defaultValue={!!experience ? experience.company_and_role : ""}
-              required
-              onChange={(e) => changeExperienceHandler(e)}
-            />
-          </Col>
-          <Col sm={1}>
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText className="pr-5">Last Name</InputGroupText>
-            </InputGroupAddon>
-          </Col>
-          <Col sm={3}>
-            <Input
-              type="text"
-              name="from_to"
-              id="from_to"
-              placeholder="Enter tenure"
-              defaultValue={!!experience ? experience.from_to : ""}
-              required
-              onChange={(e) => changeExperienceHandler(e)}
-            />
-          </Col>
-        </InputGroup>
-        {!!!info && isAuthenticated() && (
-          <InputGroup row className="text-right py-5">
-            <Col sm={12}>
-              <Button
-                color="success"
-                onClick={(event) => handleInfoSubmit(event)}
-              >
-                Add
-              </Button>
-            </Col>
-          </InputGroup>
-        )}
-        {!!info && isAuthenticated() && (
-          <InputGroup row className="text-right py-5">
-            <Col sm={11}>
-              <Button color="success" onClick={(e) => handleInfoUpdate(e)}>
-                Update
-              </Button>
-            </Col>
-            <Col sm={1}>
-              <Button
-                color="danger"
-                onClick={(event) => handleInfoDelete(event)}
-              >
-                Delete
-              </Button>
-            </Col>
-          </InputGroup>
-        )}
-      </Form>
-    </Container>
+          <Grid container item xs={12} spacing={3}>
+            <Grid item xs={12}>
+              {info && isAuthenticated() && (
+                <React.Fragment>
+                  <Button
+                    color="success"
+                    onClick={(event) => handleInfoSubmit(event)}
+                  >
+                    Add
+                  </Button>
+                  <Button color="success" onClick={(e) => handleInfoUpdate(e)}>
+                    Update
+                  </Button>
+                  <Button
+                    color="danger"
+                    onClick={(event) => handleInfoDelete(event)}
+                  >
+                    Delete
+                  </Button>
+                </React.Fragment>
+              )}
+            </Grid>
+          </Grid>
+        </Form>
+      </Grid>
+    </div>
   );
 };
 
