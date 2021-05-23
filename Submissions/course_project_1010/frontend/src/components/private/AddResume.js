@@ -51,6 +51,7 @@ const AddResume = () => {
     username: "",
   });
   const [infopayload, setInfopayload] = useState("");
+  const [infopayloadchanged, setInfopayloadchanged] = useState("");
   var username = isAuthenticated().username;
   // SUMMARY SECTION
   const [summary, setSummary] = useState("");
@@ -124,10 +125,25 @@ const AddResume = () => {
     event.persist();
     setInfopayload((prevState) => ({
       ...prevState,
-      username: `${username.toString()}`,
       [event.target.name]: event.target.value,
     }));
+
+    console.log(infopayload);
   };
+
+  useEffect(() => {
+    const updatedInfoEntries = Object.keys(infopayload)
+      .filter((key) => infopayload[key] !== info[key])
+      .reduce((obj, key) => {
+        obj[key] = infopayload[key];
+        return obj;
+      }, {});
+
+    setInfopayloadchanged(updatedInfoEntries);
+    console.log(setInfopayloadchanged);
+
+    console.log(infopayloadchanged);
+  }, [infopayload]);
 
   const handleInfoUpdate = async (index, id) => {
     const response = await fetch(
@@ -150,6 +166,7 @@ const AddResume = () => {
     if (response.status >= 400) {
       alert(`Oops! Error ${response.status}:  ${res.message}`);
     } else {
+      setInfopayloadchanged("");
       alert(`Successfully Submitted!`);
     }
   };
@@ -178,6 +195,9 @@ const AddResume = () => {
       alert(`${res}`);
     }
   };
+
+  // console.log(isValueChanged());
+  // isValueChanged();
 
   // SUMMARY SECTION
 
@@ -422,6 +442,7 @@ const AddResume = () => {
                 variant="outlined"
                 defaultValue={info.fname}
                 required
+                onChange={(e) => changeInfoHandler(e)}
               />
             </Grid>
             <Grid item xs={4}>
@@ -444,7 +465,7 @@ const AddResume = () => {
                 inputProps={{ className: "text-white" }}
                 InputLabelProps={{ className: "text-white" }}
                 label="Role"
-                name="Role"
+                name="role"
                 id="role"
                 variant="outlined"
                 defaultValue={info.role}
@@ -460,7 +481,7 @@ const AddResume = () => {
                 inputProps={{ className: "text-white" }}
                 InputLabelProps={{ className: "text-white" }}
                 label="Email"
-                name="Email"
+                name="email"
                 id="Email"
                 variant="outlined"
                 defaultValue={info.email}
@@ -474,7 +495,7 @@ const AddResume = () => {
                 inputProps={{ className: "text-white" }}
                 InputLabelProps={{ className: "text-white" }}
                 label="Phone"
-                name="Phone"
+                name="phone"
                 id="Phone"
                 variant="outlined"
                 defaultValue={info.phone}
@@ -488,7 +509,7 @@ const AddResume = () => {
                 inputProps={{ className: "text-white" }}
                 InputLabelProps={{ className: "text-white" }}
                 label="LinkedIn"
-                name="LinkedIn"
+                name="linkedIn"
                 id="LinkedIn"
                 variant="outlined"
                 defaultValue={info.linkedin}
@@ -508,9 +529,14 @@ const AddResume = () => {
                   >
                     Add
                   </Button>
-                  <Button color="success" onClick={(e) => handleInfoUpdate(e)}>
-                    Update
-                  </Button>
+                  {Object.keys(infopayloadchanged).length !== 0 && (
+                    <Button
+                      color="success"
+                      onClick={(e) => handleInfoUpdate(e)}
+                    >
+                      Update
+                    </Button>
+                  )}
                   <Button
                     color="danger"
                     onClick={(event) => handleInfoDelete(event)}

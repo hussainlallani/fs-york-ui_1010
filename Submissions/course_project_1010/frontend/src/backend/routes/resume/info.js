@@ -55,9 +55,9 @@ router.put(`/:${pkText}`, async (req, res) => {
     query.push(`${entry[0]} = '${entry[1]}'`);
   });
 
-  const sql = `UPDATE ${process.env.DBNAME}.info 
-    SET ${query} 
-    WHERE ${pkText}='${req.params[pkText]}';`;
+  console.log(query);
+
+  const sql = `UPDATE ${process.env.DBNAME}.info SET ${query} WHERE ${pkText}='${req.params[pkText]}';`;
 
   // Apply update
   try {
