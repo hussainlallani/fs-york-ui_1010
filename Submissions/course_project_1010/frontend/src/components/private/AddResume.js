@@ -15,6 +15,7 @@ import TextField from "@material-ui/core/TextField";
 // import TextField from "@material-ui/core/TextField";
 import isAuthenticated from "../../helpers/authHelper";
 import Grid from "@material-ui/core/Grid";
+import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -27,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1),
     textAlign: "center",
     color: theme.palette.text.secondary,
+  },
+  textarea: {
+    flexGrow: 0.83,
   },
 }));
 
@@ -546,6 +550,62 @@ const AddResume = () => {
                 </React.Fragment>
               )}
             </Grid>
+          </Grid>
+        </Form>
+      </Grid>
+      <Grid container spacing={1}>
+        <Form key={summary} className={classes.root}>
+          <Grid container item xs={12} spacing={3}>
+            <h1 className="py-5">Summary</h1>
+            {!summary && isAuthenticated() && (
+              <Grid container item xs={12} md={12} spacing={3}>
+                <TextareaAutosize
+                  aria-label="empty textarea"
+                  rowsMin={5}
+                  type="text"
+                  className={classes.textarea}
+                  name="summary"
+                  id="summary"
+                  placeholder="Enter summary"
+                  defaultValue={!!summary ? summary.summary : ""}
+                  required
+                  onChange={(e) => changeSummaryHandler(e)}
+                />
+                <Button
+                  color="success"
+                  onClick={(event) => handleSummarySubmit(event)}
+                >
+                  Add
+                </Button>
+              </Grid>
+            )}
+            {summary && (
+              <React.Fragment>
+                <Grid container item xs={12} md={12} spacing={3}>
+                  <TextareaAutosize
+                    aria-label="empty textarea"
+                    rowsMin={5}
+                    className={classes.textarea}
+                    type="text"
+                    name="summary"
+                    id="summary"
+                    placeholder="Enter summary"
+                    defaultValue={!!summary ? summary.summary : ""}
+                    required
+                    onChange={(e) => changeSummaryHandler(e)}
+                  />
+                </Grid>
+                <Button color="success" onClick={(e) => handleSummaryUpdate(e)}>
+                  Update
+                </Button>
+                <Button
+                  color="danger"
+                  onClick={(event) => handleSummaryDelete(event)}
+                >
+                  Delete
+                </Button>
+              </React.Fragment>
+            )}
           </Grid>
         </Form>
       </Grid>
