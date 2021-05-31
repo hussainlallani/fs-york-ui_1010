@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
   textarea: {
     flexGrow: 0.83,
+    background: "white",
   },
 }));
 
@@ -428,6 +429,49 @@ const AddResume = () => {
 
   const classes = useStyles();
 
+  const summaryAddBtnMarkup = isAuthenticated() ? (
+    <Button color="success" onClick={(event) => handleSummarySubmit(event)}>
+      Add
+    </Button>
+  ) : (
+    <React.Fragment>""</React.Fragment>
+  );
+
+  const summaryDelBtnMarkup = isAuthenticated() ? (
+    <Button color="danger" onClick={(event) => handleSummaryDelete(event)}>
+      Delete
+    </Button>
+  ) : (
+    <React.Fragment>""</React.Fragment>
+  );
+
+  const summaryUpdBtnMarkup = isAuthenticated() ? (
+    <Button color="success" onClick={(e) => handleSummaryUpdate(e)}>
+      Update
+    </Button>
+  ) : (
+    <React.Fragment>""</React.Fragment>
+  );
+
+  const summaryInputMarkup = (
+    <TextField
+      aria-label="empty textarea"
+      rowsMin={5}
+      type="text"
+      className={classes.textarea}
+      name="summary"
+      id="summary"
+      placeholder="Enter summary"
+      multiline
+      defaultValue={!!summary ? summary.summary : ""}
+      required
+      onChange={(e) => changeSummaryHandler(e)}
+      InputProps={{
+        readOnly: isAuthenticated() ? false : true,
+      }}
+    />
+  );
+
   return (
     <div className={classes.root}>
       <Grid container spacing={1}>
@@ -557,7 +601,23 @@ const AddResume = () => {
         <Form key={summary} className={classes.root}>
           <Grid container item xs={12} spacing={3}>
             <h1 className="py-5">Summary</h1>
-            {!summary && isAuthenticated() && (
+            {summary
+              ? "TRUE SUMMARY" && (
+                  <Grid container item xs={12} md={12} spacing={3}>
+                    {summaryInputMarkup}
+                    {summaryDelBtnMarkup}
+                  </Grid>
+                )
+              : "FALSE SUMMARY" && (
+                  <React.Fragment>
+                    {summaryInputMarkup}
+                    {summaryAddBtnMarkup}
+                  </React.Fragment>
+                )}
+
+            {/* OLD CODE */}
+
+            {isAuthenticated() && !summary && (
               <Grid container item xs={12} md={12} spacing={3}>
                 <TextareaAutosize
                   aria-label="empty textarea"
@@ -590,12 +650,13 @@ const AddResume = () => {
                     name="summary"
                     id="summary"
                     placeholder="Enter summary"
-                    defaultValue={!!summary ? summary.summary : ""}
+                    // defaultValue={!!summary ? summary.summary : ""}
+                    defaultValue={summary.summary}
                     required
                     onChange={(e) => changeSummaryHandler(e)}
                   />
                 </Grid>
-                <Button color="success" onClick={(e) => handleSummaryUpdate(e)}>
+                {/* <Button color="success" onClick={(e) => handleSummaryUpdate(e)}>
                   Update
                 </Button>
                 <Button
@@ -603,7 +664,7 @@ const AddResume = () => {
                   onClick={(event) => handleSummaryDelete(event)}
                 >
                   Delete
-                </Button>
+                </Button> */}
               </React.Fragment>
             )}
           </Grid>
