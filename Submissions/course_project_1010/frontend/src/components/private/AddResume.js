@@ -61,6 +61,7 @@ const AddResume = () => {
   // SUMMARY SECTION
   const [summary, setSummary] = useState("");
   const [summarypayload, setSummarypayload] = useState("");
+  const [summarypayloadchanged, setSummarypayloadchanged] = useState("");
   // EXPERIENCE SECTION
   const [company_and_role, setCompany_and_role] = useState("");
   const [from_to, setFrom_to] = useState("");
@@ -145,8 +146,6 @@ const AddResume = () => {
       }, {});
 
     setInfopayloadchanged(updatedInfoEntries);
-    console.log(setInfopayloadchanged);
-
     console.log(infopayloadchanged);
   }, [infopayload]);
 
@@ -211,17 +210,20 @@ const AddResume = () => {
 
     const token = sessionStorage.getItem("token");
     try {
-      var response = await fetch("http://localhost:3001/resume/summary", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": true,
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(summarypayload),
-      });
+      var response = await fetch(
+        `http://localhost:${process.env.REACT_APP_SERVERPORT}/resume/summary/${username}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": true,
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(summarypayload),
+        }
+      );
       setSummary("");
       var payload = await response.json();
       console.log(payload);
@@ -257,10 +259,25 @@ const AddResume = () => {
     event.persist();
     setSummarypayload((prevState) => ({
       ...prevState,
-      username: `${username.toString()}`,
+      // username: `${username.toString()}`,
       [event.target.name]: event.target.value,
     }));
   };
+
+  useEffect(() => {
+    if (summarypayload !== undefined && summary !== undefined) {
+      const summaryUpdatedEntries = Object.keys(summarypayload)
+        .filter((key) => summarypayload[key] !== summary[key])
+        .reduce((obj, key) => {
+          obj[key] = summarypayload[key];
+          return obj;
+        }, {});
+
+      setSummarypayloadchanged(summaryUpdatedEntries);
+      console.log(summarypayloadchanged);
+      console.log(Object.keys(infopayloadchanged).length);
+    }
+  }, [summarypayload]);
 
   const handleSummaryUpdate = async (index, id) => {
     const response = await fetch(
@@ -445,13 +462,14 @@ const AddResume = () => {
     <React.Fragment>""</React.Fragment>
   );
 
-  const summaryUpdBtnMarkup = isAuthenticated() ? (
-    <Button color="success" onClick={(e) => handleSummaryUpdate(e)}>
-      Update
-    </Button>
-  ) : (
-    <React.Fragment>""</React.Fragment>
-  );
+  const summaryUpdBtnMarkup =
+    isAuthenticated() && Object.keys(summarypayloadchanged).length !== 0 ? (
+      <Button color="success" onClick={(e) => handleSummaryUpdate(e)}>
+        Update
+      </Button>
+    ) : (
+      <React.Fragment></React.Fragment>
+    );
 
   const summaryInputMarkup = (
     <TextField
@@ -601,10 +619,13 @@ const AddResume = () => {
         <Form key={summary} className={classes.root}>
           <Grid container item xs={12} spacing={3}>
             <h1 className="py-5">Summary</h1>
+            {Object.keys(summarypayloadchanged).length !== 0 ? "TRUE" : "FALSE"}
+
             {summary
               ? "TRUE SUMMARY" && (
                   <Grid container item xs={12} md={12} spacing={3}>
                     {summaryInputMarkup}
+                    {summaryUpdBtnMarkup}
                     {summaryDelBtnMarkup}
                   </Grid>
                 )

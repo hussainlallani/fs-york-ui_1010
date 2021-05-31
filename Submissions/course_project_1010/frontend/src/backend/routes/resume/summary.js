@@ -10,17 +10,17 @@ import { db } from "../../database/connection.js";
 // Declare primary(param) key
 var pkText = "username";
 
-router.post("/", async (req, res) => {
+router.post(`/:${pkText}`, async (req, res) => {
   // Validate input
   const { error } = validatePayload(req.body);
   if (error) {
     return res.status(400).json(error.details[0].message);
   }
 
-  const { summary, username } = req.body;
+  const { summary } = req.body;
 
   const sql = `INSERT INTO ${process.env.DBNAME}.summary
-    ( summary, username) VALUES ( '${summary}', '${username}')`;
+    ( summary, username) VALUES ( '${summary}', '${req.params.username}')`;
 
   try {
     const result = await db.query(sql);
@@ -31,7 +31,7 @@ router.post("/", async (req, res) => {
     }
   } catch (error) {
     if (error.errno === 1062) return res.status(409).json(error.sqlMessage);
-    return res.status(500).json(error);
+    return res.status(500).json(error.message);
   }
 });
 
@@ -81,7 +81,7 @@ router.delete(`/:${pkText}`, async (req, res) => {
 function validatePayload(reqBody) {
   const schemaContactForm = Joi.object({
     summary: Joi.string().min(2).required(),
-    username: Joi.string().min(2).required(),
+    // username: Joi.string().min(2).required(),
   });
 
   return schemaContactForm.validate(reqBody);
